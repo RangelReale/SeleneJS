@@ -4,7 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
-//#include "Registry.h"
+#include "Registry.h"
 //#include "Selector.h"
 #include <tuple>
 //#include "util.h"
@@ -18,33 +18,33 @@ class State {
 private:
     duk_context *_l;
     bool _l_owner;
-    //std::unique_ptr<Registry> _registry;
+    std::unique_ptr<Registry> _registry;
     //std::unique_ptr<ExceptionHandler> _exception_handler;
 
 public:
     State() : _l(nullptr), _l_owner(true)/*, _exception_handler(new ExceptionHandler)*/ {
         _l = duk_create_heap_default();
         if (_l == nullptr) throw 0;
-        //_registry.reset(new Registry(_l));
+        _registry.reset(new Registry(_l));
         HandleExceptionsPrintingToStdOut();
     }
     State(duk_context *l) : _l(l), _l_owner(false)/*, _exception_handler(new ExceptionHandler)*/ {
-        //_registry.reset(new Registry(_l));
+        _registry.reset(new Registry(_l));
         HandleExceptionsPrintingToStdOut();
     }
     State(const State &other) = delete;
     State &operator=(const State &other) = delete;
     State(State &&other)
         : _l(other._l),
-          _l_owner(other._l_owner)/*,
-          _registry(std::move(other._registry))*/ {
+          _l_owner(other._l_owner),
+          _registry(std::move(other._registry)) {
         other._l = nullptr;
     }
     State &operator=(State &&other) {
         if (&other == this) return *this;
         _l = other._l;
         _l_owner = other._l_owner;
-        //_registry = std::move(other._registry);
+        _registry = std::move(other._registry);
         other._l = nullptr;
         return *this;
     }
