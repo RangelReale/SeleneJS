@@ -6,11 +6,13 @@
 
 #include <duktape.h>
 #include "refs.h"
+#include "lmetatable.h"
+#include "metatable.h"
 
 namespace seljs {
 
 namespace detail {
-struct GetUserdataParameterFromLuaTypeError {
+struct GetUserdataParameterFromJSTypeError {
     std::string metatable_name;
     int index;
 };
@@ -71,99 +73,99 @@ static inline void PushNewMetatable(duk_context *state, TypeID type, const std::
     duk_pop_n(state, 1);
 
 
-    luaL_newmetatable(state, name.c_str()); // Actual result.
+    duvL_newmetatable(state, name.c_str()); // Actual result.
 
 
     detail::_push_meta_table(state);
 
     detail::_push_typeinfo(state, type);
-    lua_pushvalue(state, -3);
-    lua_settable(state, -3);
+    duk_dup(state, -3);
+    duk_put_prop(state, -3);
 
-    lua_pop(state, 1);
+    duk_pop(state);
 }
 
-static inline bool SetMetatable(lua_State *state, TypeID type) {
+static inline bool SetMetatable(duk_context *state, TypeID type) {
     detail::_get_metatable(state, type);
 
-    if(lua_istable(state, -1)) {
-        lua_setmetatable(state, -2);
+	if (duk_is_object(state, -1)) {
+        duv_setmetatable(state, -2);
         return true;
     }
 
-    lua_pop(state, 1);
+    duk_pop(state);
     return false;
 }
 
-static inline bool IsRegisteredType(lua_State *state, TypeID type) {
+static inline bool IsRegisteredType(duk_context *state, TypeID type) {
     detail::_push_names_table(state);
     detail::_push_typeinfo(state, type);
-    lua_gettable(state, -2);
+    duk_get_prop(state, -2);
 
-    bool registered = lua_isstring(state, -1);
-    lua_pop(state, 2);
+    bool registered = duk_is_string(state, -1) != 0;
+    duk_pop_2(state);
     return registered;
 }
 
-static inline std::string GetTypeName(lua_State *state, TypeID type) {
+static inline std::string GetTypeName(duk_context *state, TypeID type) {
     std::string name("unregistered type");
 
     detail::_push_names_table(state);
     detail::_push_typeinfo(state, type);
-    lua_gettable(state, -2);
+    duk_get_prop(state, -2);
 
-    if(lua_isstring(state, -1)) {
+    if(duk_is_string(state, -1) != 0) {
         size_t len = 0;
-        char const * str = lua_tolstring(state, -1, &len);
+        char const * str = duk_to_lstring(state, -1, &len);
         name.assign(str, len);
     }
 
-    lua_pop(state, 2);
+    duk_pop_2(state);
     return name;
 }
 
-static inline std::string GetTypeName(lua_State *state, int index) {
+static inline std::string GetTypeName(duk_context *state, int index) {
     std::string name;
 
-    if(lua_getmetatable(state, index)) {
-        lua_pushliteral(state, "__name");
-        lua_gettable(state, -2);
+    if(duv_getmetatable(state, index) != 0) {
+		duk_push_string(state, "__name");
+		duk_get_prop(state, -2);
 
-        if(lua_isstring(state, -1)) {
+        if(duk_is_string(state, -1) != 0) {
             size_t len = 0;
-            char const * str = lua_tolstring(state, -1, &len);
+            char const * str = duk_to_lstring(state, -1, &len);
             name.assign(str, len);
         }
 
-        lua_pop(state, 2);
+        duk_pop_2(state);
     }
 
     if(name.empty()) {
-        name = lua_typename(state, lua_type(state, index));
+        name = duv_typename(state, duk_get_type(state, index));
     }
 
     return name;
 }
 
-static inline bool IsType(lua_State *state, TypeID type, const int index) {
+static inline bool IsType(duk_context *state, TypeID type, const int index) {
     bool equal = true;
 
-    if(lua_getmetatable(state, index)) {
+    if(duv_getmetatable(state, index)) {
         detail::_get_metatable(state, type);
-        equal = lua_istable(state, -1) && lua_rawequal(state, -1, -2);
-        lua_pop(state, 2);
+        equal = duk_is_object(state, -1)!=0 && duk_equals(state, -1, -2)!=0; // POSSIBLE PROBLEM
+        duk_pop_2(state);
     } else {
         detail::_get_metatable(state, type);
-        equal = !lua_istable(state, -1);
-        lua_pop(state, 1);
+        equal = duk_is_object(state, -1)==0;
+        duk_pop(state);
     }
 
     return equal;
 }
 
-static inline void CheckType(lua_State *state, TypeID type, const int index) {
+static inline void CheckType(duk_context *state, TypeID type, const int index) {
     if(!IsType(state, type, index)) {
-        throw sel::detail::GetUserdataParameterFromLuaTypeError{
+        throw seljs::detail::GetUserdataParameterFromJSTypeError{
             GetTypeName(state, type),
             index
         };

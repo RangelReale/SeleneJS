@@ -1,5 +1,7 @@
 #include <selenejs.h>
 
+#include <iostream>
+
 int main() {
 	seljs::State state;
 
@@ -17,4 +19,8 @@ int main() {
 		}
 	};
 	)JS");
+
+	std::string description = state["Info"]["description"];
+
+	std::cout << description << std::endl;
 }

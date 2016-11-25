@@ -2,6 +2,9 @@
 
 #include <duktape.h>
 
+#define DUV_NOREF       (-2)
+#define DUV_REFNIL      (-1)
+
 namespace seljs {
 
 // Create a global array refs in the heap stash.

@@ -77,6 +77,7 @@ inline std::exception_ptr extract_stored_exception(lua_State *l) {
     }
     return nullptr;
 }
+*/
 
 class ExceptionHandler {
 public:
@@ -90,7 +91,8 @@ public:
 
     explicit ExceptionHandler(function && handler) : _handler(handler) {}
 
-    void Handle(int luaStatusCode, std::string message, std::exception_ptr exception = nullptr) {
+	/*
+	void Handle(int luaStatusCode, std::string message, std::exception_ptr exception = nullptr) {
         if(_handler) {
             _handler(luaStatusCode, std::move(message), std::move(exception));
         }
@@ -109,7 +111,7 @@ public:
                 detail::_get(detail::_id<std::string>(), L, -1));
         }
     }
+	*/
 
 };
-*/
 }

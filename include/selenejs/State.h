@@ -5,9 +5,9 @@
 #include <memory>
 #include <string>
 #include "Registry.h"
-//#include "Selector.h"
+#include "Selector.h"
 #include <tuple>
-//#include "util.h"
+#include "util.h"
 #include <vector>
 
 //// Selector.h
@@ -19,16 +19,16 @@ private:
     duk_context *_l;
     bool _l_owner;
     std::unique_ptr<Registry> _registry;
-    //std::unique_ptr<ExceptionHandler> _exception_handler;
+    std::unique_ptr<ExceptionHandler> _exception_handler;
 
 public:
-    State() : _l(nullptr), _l_owner(true)/*, _exception_handler(new ExceptionHandler)*/ {
+    State() : _l(nullptr), _l_owner(true), _exception_handler(new ExceptionHandler) {
         _l = duk_create_heap_default();
         if (_l == nullptr) throw 0;
         _registry.reset(new Registry(_l));
         HandleExceptionsPrintingToStdOut();
     }
-    State(duk_context *l) : _l(l), _l_owner(false)/*, _exception_handler(new ExceptionHandler)*/ {
+    State(duk_context *l) : _l(l), _l_owner(false), _exception_handler(new ExceptionHandler) {
         _registry.reset(new Registry(_l));
         HandleExceptionsPrintingToStdOut();
     }
@@ -74,21 +74,17 @@ public:
     }
 
     void HandleExceptionsPrintingToStdOut() {
-        //*_exception_handler = ExceptionHandler([](int, std::string msg, std::exception_ptr){_print(msg);});
+        *_exception_handler = ExceptionHandler([](int, std::string msg, std::exception_ptr){_print(msg);});
     }
 
-	/*
     void HandleExceptionsWith(ExceptionHandler::function handler) {
         *_exception_handler = ExceptionHandler(std::move(handler));
     }
-	*/
 
 public:
-	/*
     Selector operator[](const char *name) {
         return Selector(_l, *_registry, *_exception_handler, name);
     }
-	*/
 
     bool operator()(const char *code) {
         ResetStackOnScopeExit savedStack(_l);
