@@ -71,7 +71,7 @@ private:
     void _get(JSRef r) const {
         r.Push(_state);
 		duk_get_prop(_state, -2);
-        duk_remove(_state, duk_normalize_index(_state, -2));
+        duk_remove(_state, -2);
     }
 
     // Pushes this element to the stack
@@ -127,11 +127,11 @@ private:
         if(!_functor_active) return;
         _functor_active = false;
         // install handler, and swap(handler, function) on lua stack
-        int handler_index = SetErrorHandler(_state);
+        /*int handler_index = SetErrorHandler(_state);
         int func_index = handler_index - 1;
         duk_dup(_state, func_index);
         duk_copy(_state, handler_index, func_index);
-        duk_replace(_state, handler_index);
+        duk_replace(_state, handler_index);*/
         // call lua function with error handler
         for(auto const & arg : _functor_arguments) {
             arg.Push(_state);
@@ -141,7 +141,7 @@ private:
             duk_pcall(_state, _functor_arguments.size());
 
         // remove error handler
-        duk_remove(_state, handler_index - 1);
+        //duk_remove(_state, handler_index - 1);
 
         if (statusCode != DUK_EXEC_SUCCESS) {
             //_exception_handler->Handle_top_of_stack(statusCode, _state);
@@ -258,13 +258,13 @@ public:
         });
     }
 
-    /*template <typename T, typename... Funs>
+    template <typename T, typename... Funs>
     void SetObj(T &t, Funs... funs) {
         auto fun_tuple = std::make_tuple(std::forward<Funs>(funs)...);
         _evaluate_store([this, &t, &fun_tuple]() {
             _registry->Register(t, fun_tuple);
         });
-    }*/
+    }
 
     /*template <typename T, typename... Args, typename... Funs>
     void SetClass(Funs... funs) {

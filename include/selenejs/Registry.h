@@ -4,7 +4,7 @@
 #include <functional>
 #include "Fun.h"
 #include "MetatableRegistry.h"
-//#include "Obj.h"
+#include "Obj.h"
 #include "util.h"
 #include <vector>
 
@@ -21,7 +21,7 @@ struct lambda_traits<Ret(T::*)(Args...) const> {
 class Registry {
 private:
     std::vector<std::unique_ptr<BaseFun>> _funs;
-    //std::vector<std::unique_ptr<BaseObj>> _objs;
+    std::vector<std::unique_ptr<BaseObj>> _objs;
     //std::vector<std::unique_ptr<BaseClass>> _classes;
     duk_context *_state;
 public:
@@ -56,7 +56,6 @@ public:
                  typename detail::_indices_builder<sizeof...(Funs)>::type{});
     }
 
-	/*
     template <typename T, typename... Funs, size_t... N>
     void Register(T &t, std::tuple<Funs...> funs, detail::_indices<N...>) {
         RegisterObj(t, std::get<N>(funs)...);
@@ -67,7 +66,8 @@ public:
         _objs.emplace_back(seljs::make_unique<Obj<T, Funs...>>(_state, &t, funs...));
     }
 
-    template <typename T, typename... CtorArgs, typename... Funs, size_t... N>
+	/*
+	template <typename T, typename... CtorArgs, typename... Funs, size_t... N>
     void RegisterClass(const std::string &name, std::tuple<Funs...> funs,
                        detail::_indices<N...>) {
         RegisterClassWorker<T, CtorArgs...>(name, std::get<N>(funs)...);

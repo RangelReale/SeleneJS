@@ -7,6 +7,19 @@ int functest(int a, std::string b)
 	return a + 15;
 }
 
+struct Foo {
+	int x;
+	const int y;
+	Foo(int x_) : x(x_), y(3) {}
+	int GetX() { return x; }
+	int DoubleAdd(int y) {
+		return 2 * (x + y);
+	}
+	void SetX(int x_) {
+		x = x_;
+	}
+};
+
 int main() {
 	try
 	{
@@ -32,6 +45,11 @@ int main() {
 
 		state["functest"] = &functest;
 		state("print(functest(5, 'aaa'));");
+
+		Foo foo_instance(1);
+		state["foo_instance"].SetObj(foo_instance, "double_add", &Foo::DoubleAdd);
+		const int answer = state["foo_instance"]["double_add"](3);
+		std::cout << "Answer: " << answer << std::endl;
 	} catch (std::exception &e) {
 		std::cout << "Error: " << e.what() << std::endl;
 	}
