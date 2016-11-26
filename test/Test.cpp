@@ -2,10 +2,17 @@
 
 #include <iostream>
 
-int main() {
-	seljs::State state;
+int functest(int a, std::string b)
+{
+	return a + 15;
+}
 
-	state(R"JS(
+int main() {
+	try
+	{
+		seljs::State state;
+
+		state(R"JS(
 	var Info = {
 		version: 1,
 		description: 'Test JS Plugin',
@@ -20,7 +27,12 @@ int main() {
 	};
 	)JS");
 
-	std::string description = state["Info"]["description"];
+		std::string description = state["Info"]["description"];
+		std::cout << description << std::endl;
 
-	std::cout << description << std::endl;
+		state["functest"] = &functest;
+		state("print(functest(5, 'aaa'));");
+	} catch (std::exception &e) {
+		std::cout << "Error: " << e.what() << std::endl;
+	}
 }

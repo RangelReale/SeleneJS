@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 project(SeleneJS)
 
 set(CMAKE_CXX_STANDARD 14)
+add_definitions(-DDUK_OPT_CPP_EXCEPTIONS)
 
 #[[
 if(APPLE)

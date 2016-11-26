@@ -2,10 +2,10 @@
 
 //#include "Class.h"
 #include <functional>
-//#include "Fun.h"
+#include "Fun.h"
 #include "MetatableRegistry.h"
 //#include "Obj.h"
-//#include "util.h"
+#include "util.h"
 #include <vector>
 
 namespace seljs {
@@ -20,7 +20,7 @@ struct lambda_traits<Ret(T::*)(Args...) const> {
 }
 class Registry {
 private:
-    //std::vector<std::unique_ptr<BaseFun>> _funs;
+    std::vector<std::unique_ptr<BaseFun>> _funs;
     //std::vector<std::unique_ptr<BaseObj>> _objs;
     //std::vector<std::unique_ptr<BaseClass>> _classes;
     duk_context *_state;
@@ -29,8 +29,7 @@ public:
         MetatableRegistry::Create(_state);
     }
 
-	/*
-    template <typename L>
+	template <typename L>
     void Register(L lambda) {
         Register((typename detail::lambda_traits<L>::Fun)(lambda));
     }
@@ -39,7 +38,7 @@ public:
     void Register(std::function<Ret(Args...)> fun) {
         constexpr int arity = detail::_arity<Ret>::value;
         _funs.emplace_back(
-            sel::make_unique<Fun<arity, Ret, Args...>>(
+            seljs::make_unique<Fun<arity, Ret, Args...>>(
                 _state, fun));
     }
 
@@ -47,7 +46,7 @@ public:
     void Register(Ret (*fun)(Args...)) {
         constexpr int arity = detail::_arity<Ret>::value;
         _funs.emplace_back(
-            sel::make_unique<Fun<arity, Ret, Args...>>(
+            seljs::make_unique<Fun<arity, Ret, Args...>>(
                 _state, fun));
     }
 
@@ -57,6 +56,7 @@ public:
                  typename detail::_indices_builder<sizeof...(Funs)>::type{});
     }
 
+	/*
     template <typename T, typename... Funs, size_t... N>
     void Register(T &t, std::tuple<Funs...> funs, detail::_indices<N...>) {
         RegisterObj(t, std::get<N>(funs)...);
@@ -64,7 +64,7 @@ public:
 
     template <typename T, typename... Funs>
     void RegisterObj(T &t, Funs... funs) {
-        _objs.emplace_back(sel::make_unique<Obj<T, Funs...>>(_state, &t, funs...));
+        _objs.emplace_back(seljs::make_unique<Obj<T, Funs...>>(_state, &t, funs...));
     }
 
     template <typename T, typename... CtorArgs, typename... Funs, size_t... N>
@@ -76,7 +76,7 @@ public:
     template <typename T, typename... CtorArgs, typename... Funs>
     void RegisterClassWorker(const std::string &name, Funs... funs) {
         _classes.emplace_back(
-            sel::make_unique<Class<T, Ctor<T, CtorArgs...>, Funs...>>(
+            seljs::make_unique<Class<T, Ctor<T, CtorArgs...>, Funs...>>(
                 _state, name, funs...));
     }
 	*/

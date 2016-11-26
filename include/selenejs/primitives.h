@@ -104,14 +104,14 @@ inline std::string _get(_id<std::string>, duk_context *l, const int index) {
     return std::string{buff, size};
 }
 
-using _duk_check_get = void (*)(duk_context *l, int index);
+using _js_check_get = void (*)(duk_context *l, int index);
 // Throw this on conversion errors to prevent long jumps caused in Lua from
 // bypassing destructors. The outermost function can then call checkd_get(index)
 // in a context where a long jump is safe.
 // This way we let Lua generate the error message and use proper stack
 // unwinding.
 struct GetParameterFromJSTypeError {
-    _duk_check_get checked_get;
+    _js_check_get checked_get;
     int index;
 };
 

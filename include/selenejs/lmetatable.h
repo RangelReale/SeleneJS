@@ -19,4 +19,10 @@ inline duk_int_t duvL_newmetatable(duk_context *ctx, const char *tname) {
 	return 1;
 }
 
+inline void *duvL_checkudata(duk_context *ctx, duk_idx_t index, const char *tname)
+{
+	// TODO
+	return NULL;
+}
+
 }

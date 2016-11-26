@@ -186,13 +186,13 @@ public:
         copy._functor_active = true;
         return copy;
     }
-	/*
+
     template <typename L>
     void operator=(L lambda) const {
         _evaluate_store([this, lambda]() {
             _registry->Register(lambda);
         });
-    }*/
+    }
 
     void operator=(bool b) const {
         _evaluate_store([this, b]() {
@@ -224,12 +224,12 @@ public:
         });
     }
 
-    /*template <typename Ret, typename... Args>
+    template <typename Ret, typename... Args>
     void operator=(std::function<Ret(Args...)> fun) {
         _evaluate_store([this, fun]() {
             _registry->Register(fun);
         });
-    }*/
+    }
 
     template<typename T>
     void operator=(Reference<T> const & ref) {
@@ -245,12 +245,12 @@ public:
         });
     }
 
-    /*template <typename Ret, typename... Args>
+    template <typename Ret, typename... Args>
     void operator=(Ret (*fun)(Args...)) {
         _evaluate_store([this, fun]() {
             _registry->Register(fun);
         });
-    }*/
+    }
 
     void operator=(const char *s) const {
         _evaluate_store([this, s]() {

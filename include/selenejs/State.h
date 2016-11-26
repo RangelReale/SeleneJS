@@ -89,6 +89,7 @@ public:
     bool operator()(const char *code) {
         ResetStackOnScopeExit savedStack(_l);
 		if (duk_peval_string(_l, code) != 0) {
+			throw TypeError{ duk_safe_to_string(_l, -1) }; // TEMP
 			//_exception_handler->Handle_top_of_stack(status, _l);
             return false;
         }
