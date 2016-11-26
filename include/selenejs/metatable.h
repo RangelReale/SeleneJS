@@ -6,15 +6,12 @@ namespace seljs {
 
 void duv_setmetatable(duk_context *ctx, duk_idx_t index)
 {
-	duk_put_prop_string(ctx, index, "\xFF" "_metatable");
+	duk_set_prototype(ctx, index);
 }
 
 int duv_getmetatable(duk_context *ctx, duk_idx_t index)
 {
-	if (duk_get_prop_string(ctx, index, "\xFF" "_metatable") == 0) {
-		duk_pop(ctx); // undefined
-		return 0;
-	}
+	duk_get_prototype(ctx, index);
 	return 1;
 }
 

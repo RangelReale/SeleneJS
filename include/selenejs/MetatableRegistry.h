@@ -59,8 +59,8 @@ static inline void _get_metatable(duk_context *state, TypeID type) {
 
 static inline void Create(duk_context *state) {
 	duv_ref_setup(state);
-    detail::_create_table_in_registry(state, "selene_metatable_names");
-    detail::_create_table_in_registry(state, "selene_metatables");
+    detail::_create_table_in_registry(state, "selenejs_metatable_names");
+    detail::_create_table_in_registry(state, "selenejs_metatables");
 }
 
 static inline void PushNewMetatable(duk_context *state, TypeID type, const std::string& name) {

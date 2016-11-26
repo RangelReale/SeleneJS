@@ -266,14 +266,14 @@ public:
         });
     }
 
-    /*template <typename T, typename... Args, typename... Funs>
+    template <typename T, typename... Args, typename... Funs>
     void SetClass(Funs... funs) {
         auto fun_tuple = std::make_tuple(std::forward<Funs>(funs)...);
         _evaluate_store([this, &fun_tuple]() {
             typename detail::_indices_builder<sizeof...(Funs)>::type d;
             _registry->RegisterClass<T, Args...>(_name, fun_tuple, d);
         });
-    }*/
+    }
 
     template <typename... Ret>
     std::tuple<Ret...> GetTuple() const {
@@ -314,6 +314,12 @@ public:
         _evaluate_retrieve(1);
         return detail::_pop(detail::_id<Pointer<T>>{}, _state);
     }
+
+	std::string type() const {
+		ResetStackOnScopeExit save(_state);
+		_evaluate_retrieve(1);
+		return std::string(duv_typename(_state, duk_get_type(_state, -1)));
+	}
 
     operator bool() const {
         ResetStackOnScopeExit save(_state);

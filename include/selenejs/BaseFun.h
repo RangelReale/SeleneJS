@@ -18,6 +18,7 @@ struct BaseFun {
 namespace detail {
 
 inline duk_ret_t _js_dispatcher(duk_context *l) {
+	duk_push_this(l);
 	duk_push_current_function(l);
     BaseFun *fun = (BaseFun *)duv_get_c_function_ptr(l, -1);
     _js_check_get raiseParameterConversionError = nullptr;

@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "Class.h"
+#include "Class.h"
 #include <functional>
 #include "Fun.h"
 #include "MetatableRegistry.h"
@@ -22,7 +22,7 @@ class Registry {
 private:
     std::vector<std::unique_ptr<BaseFun>> _funs;
     std::vector<std::unique_ptr<BaseObj>> _objs;
-    //std::vector<std::unique_ptr<BaseClass>> _classes;
+    std::vector<std::unique_ptr<BaseClass>> _classes;
     duk_context *_state;
 public:
     Registry(duk_context *state) : _state(state) {
@@ -66,7 +66,6 @@ public:
         _objs.emplace_back(seljs::make_unique<Obj<T, Funs...>>(_state, &t, funs...));
     }
 
-	/*
 	template <typename T, typename... CtorArgs, typename... Funs, size_t... N>
     void RegisterClass(const std::string &name, std::tuple<Funs...> funs,
                        detail::_indices<N...>) {
@@ -79,6 +78,5 @@ public:
             seljs::make_unique<Class<T, Ctor<T, CtorArgs...>, Funs...>>(
                 _state, name, funs...));
     }
-	*/
 };
 }

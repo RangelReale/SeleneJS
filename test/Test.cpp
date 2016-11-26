@@ -20,6 +20,23 @@ struct Foo {
 	}
 };
 
+struct Bar {
+	int x;
+	Bar(int num) { x = num; }
+
+	std::string Print(int y) {
+		return std::to_string(x) + "+" + std::to_string(y);
+	}
+
+	void SetX(int x2) {
+		x = x2;
+	}
+
+	int GetX() {
+		return x;
+	}
+};
+
 int main() {
 	try
 	{
@@ -50,6 +67,22 @@ int main() {
 		state["foo_instance"].SetObj(foo_instance, "double_add", &Foo::DoubleAdd);
 		const int answer = state["foo_instance"]["double_add"](3);
 		std::cout << "Answer: " << answer << std::endl;
+
+		state["Bar"].SetClass<Bar, int>("print", &Bar::Print, "get_x", &Bar::GetX);
+		state("var abar = new Bar.Bar(8);");
+		auto ab = state["abar"];
+		std::cout << ab.type() << std::endl;
+		auto abx = ab["get_x"];
+		std::cout << abx.type() << std::endl;
+		//int gx = state["abar"]["get_x"]();
+		state("var barx = abar.get_x();");
+		state("var barp = abar.print(2);");
+
+		int result1 = state["barx"];
+		std::string result2 = state["barp"];
+
+		std::cout << "Bar: barx=" << result1 << " barp=" << result2 << std::endl;
+
 	} catch (std::exception &e) {
 		std::cout << "Error: " << e.what() << std::endl;
 	}
