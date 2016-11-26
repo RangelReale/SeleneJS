@@ -15,12 +15,10 @@ private:
     std::string _metatable_name;
 
     T *_get(duk_context *state) {
+		// get obj from "this" binding
 		duk_get_prop_string(state, -2, "\xFF" "_obj");
 		T *ret = (T *)duk_get_buffer(state, -1, NULL);
 		duk_pop(state);
-
-        //T *ret = (T *)duvL_checkudata(state, 1, _metatable_name.c_str());
-        //duk_remove(state, 1);
         return ret;
     }
 
@@ -58,9 +56,11 @@ private:
     std::string _metatable_name;
 
     T *_get(duk_context *state) {
-        T *ret = (T *)duvL_checkudata(state, 1, _metatable_name.c_str());
-        lua_remove(state, 1);
-        return ret;
+		// get obj from "this" binding
+		duk_get_prop_string(state, -2, "\xFF" "_obj");
+		T *ret = (T *)duk_get_buffer(state, -1, NULL);
+		duk_pop(state);
+		return ret;
     }
 
 public:

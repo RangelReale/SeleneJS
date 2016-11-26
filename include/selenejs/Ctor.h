@@ -16,6 +16,7 @@ public:
          const std::string &metatable_name,
 		 const std::string &class_name)
          : _ctor([metatable_name](duk_context *state, Args... args) {
+			// put obj in _obj property
 			duk_push_object(state);
             void *addr = duk_push_fixed_buffer(state, sizeof(T));
             new(addr) T(args...);
