@@ -1,59 +1,60 @@
 #pragma once
 #include <functional>
-//#include "primitives.h"
+#include "primitives.h"
 #include <string>
+#include "lmetatable.h"
 
 #include <duktape.h>
 
 namespace seljs {
-/*
+
 struct stored_exception {
     std::string what;
     std::exception_ptr exception;
 };
 
 inline std::string const * _stored_exception_metatable_name() {
-    static std::string const name = "selene_stored_exception";
+    static std::string const name = "selenejs_stored_exception";
     return &name;
 }
 
-inline int _delete_stored_exception(lua_State * l) {
-    void * user_data = lua_touserdata(l, -1);
-    static_cast<stored_exception *>(user_data)->~stored_exception();
+inline duk_ret_t _delete_stored_exception(duk_context * l) {
+	void * user_data = duk_to_buffer(l, -1, NULL);
+	static_cast<stored_exception *>(user_data)->~stored_exception();
     return 0;
 }
 
-inline int _push_stored_exceptions_what(lua_State * l) {
-    void * user_data = lua_touserdata(l, -1);
+inline duk_ret_t _push_stored_exceptions_what(duk_context * l) {
+    void * user_data = duk_to_buffer(l, -1, NULL);
     std::string const & what = static_cast<stored_exception *>(user_data)->what;
     detail::_push(l, what);
     return 1;
 }
 
-inline void _register_stored_exception_metatable(lua_State * l) {
-    luaL_newmetatable(l, _stored_exception_metatable_name()->c_str());
-    lua_pushcfunction(l, _delete_stored_exception);
-    lua_setfield(l, -2, "__gc");
-    lua_pushcclosure(l, _push_stored_exceptions_what, 0);
-    lua_setfield(l, -2, "__tostring");
+inline void _register_stored_exception_metatable(duk_context * l) {
+    duvL_newmetatable(l, _stored_exception_metatable_name()->c_str());
+    duk_push_c_function(l, _delete_stored_exception, 1);
+	duk_set_finalizer(l, -2);
+	duk_push_c_function(l, _push_stored_exceptions_what, 1); // TODO
+	duk_put_prop_string(l, -2, "toString");
 }
 
-inline void store_current_exception(lua_State * l, char const * what) {
-    void * user_data = lua_newuserdata(l, sizeof(stored_exception));
+inline void store_current_exception(duk_context * l, char const * what) {
+    void * user_data = duk_push_fixed_buffer(l, sizeof(stored_exception));
     new(user_data) stored_exception{what, std::current_exception()};
 
-    luaL_getmetatable(l, _stored_exception_metatable_name()->c_str());
-    if(lua_isnil(l, -1)) {
-        lua_pop(l, 1);
+    duvL_getmetatable(l, _stored_exception_metatable_name()->c_str());
+    if(duk_is_undefined(l, -1) != 0) {
+        duk_pop(l);
         _register_stored_exception_metatable(l);
     }
 
-    lua_setmetatable(l, -2);
+    duv_setmetatable(l, -2);
 }
 
-inline stored_exception * test_stored_exception(lua_State *l) {
-    if(lua_isuserdata(l, -1)) {
-        void * user_data = luaL_testudata(l, -1, _stored_exception_metatable_name()->c_str());
+inline stored_exception * test_stored_exception(duk_context *l) {
+    if(duk_is_buffer(l, -1)) {
+		void * user_data = duk_get_buffer(l, -1, NULL); //, _stored_exception_metatable_name()->c_str());
         if(user_data != nullptr) {
             return static_cast<stored_exception *>(user_data);
         }
@@ -61,7 +62,7 @@ inline stored_exception * test_stored_exception(lua_State *l) {
     return nullptr;
 }
 
-inline bool push_stored_exceptions_what(lua_State * l) {
+inline bool push_stored_exceptions_what(duk_context * l) {
     stored_exception * stored = test_stored_exception(l);
     if(stored != nullptr) {
         detail::_push(l, static_cast<const std::string &>(stored->what));
@@ -70,14 +71,19 @@ inline bool push_stored_exceptions_what(lua_State * l) {
     return false;
 }
 
-inline std::exception_ptr extract_stored_exception(lua_State *l) {
+inline std::exception_ptr extract_stored_exception(duk_context *l) {
     stored_exception * stored = test_stored_exception(l);
     if(stored != nullptr) {
         return stored->exception;
     }
     return nullptr;
 }
-*/
+
+inline void fatal_function(duk_context *ctx, duk_errcode_t code, const char *msg)
+{
+	store_current_exception(ctx, msg);
+	// should stop the applcation
+}
 
 class ExceptionHandler {
 public:
@@ -91,27 +97,25 @@ public:
 
     explicit ExceptionHandler(function && handler) : _handler(handler) {}
 
-	/*
-	void Handle(int luaStatusCode, std::string message, std::exception_ptr exception = nullptr) {
+	void Handle(int jsStatusCode, std::string message, std::exception_ptr exception = nullptr) {
         if(_handler) {
-            _handler(luaStatusCode, std::move(message), std::move(exception));
+            _handler(jsStatusCode, std::move(message), std::move(exception));
         }
     }
 
-    void Handle_top_of_stack(int luaStatusCode, lua_State *L) {
+    void Handle_top_of_stack(int jsStatusCode, duk_context *L) {
         stored_exception * stored = test_stored_exception(L);
         if(stored) {
             Handle(
-                luaStatusCode,
+                jsStatusCode,
                 stored->what,
                 stored->exception);
         } else {
             Handle(
-                luaStatusCode,
+                jsStatusCode,
                 detail::_get(detail::_id<std::string>(), L, -1));
         }
     }
-	*/
 
 };
 }

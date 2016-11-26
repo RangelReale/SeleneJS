@@ -21,7 +21,7 @@ public:
             void *addr = duk_push_fixed_buffer(state, sizeof(T));
             new(addr) T(args...);
 			duk_put_prop_string(state, -2, "\xFF" "_obj");
-            duvL_setmetatable(state, metatable_name.c_str()); // TODO
+            duvL_setmetatable(state, metatable_name.c_str());
            }) {
 		duv_push_c_function_ptr(l, &detail::_js_dispatcher, DUK_VARARGS, (void *)static_cast<BaseFun *>(this));
 		duk_put_prop_string(l, -2, class_name.c_str()); // use class name as function name

@@ -42,14 +42,10 @@ inline void _print(T arg, Ts... args) {
 }
 
 inline bool check(duk_context *L, int code) {
-#if LUA_VERSION_NUM >= 502
-    if (code == LUA_OK) {
-#else
     if (code == 0) {
-#endif
         return true;
     } else {
-        std::cout << duk_to_string(L, -1) << std::endl;
+        std::cout << duk_safe_to_string(L, -1) << std::endl;
         return false;
     }
 }
@@ -75,22 +71,16 @@ inline int Traceback(duk_context *L) {
     return 1;
 }
 
-// TODO
-inline int ErrorHandler(duk_context *L) {
-	/*
+inline duk_ret_t ErrorHandler(duk_context *L) {
     if(test_stored_exception(L) != nullptr) {
         return 1;
     }
 
     return Traceback(L);
-	*/
-	return 0;
 }
 
-// TODO
 inline int SetErrorHandler(duk_context *L) {
-    //lua_pushcfunction(L, &ErrorHandler);
-	duk_push_undefined(L);
+	duk_push_c_function(L, &ErrorHandler, 1);
     return duk_get_top(L);
 }
 

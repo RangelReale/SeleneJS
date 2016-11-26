@@ -152,7 +152,7 @@ static inline bool IsType(duk_context *state, TypeID type, const int index) {
 
     if(duv_getmetatable(state, index)) {
         detail::_get_metatable(state, type);
-        equal = duk_is_object(state, -1)!=0 && duk_equals(state, -1, -2)!=0; // POSSIBLE PROBLEM
+        equal = duk_is_object(state, -1)!=0 && duk_equals(state, -1, -2)!=0; // POSSIBLE PROBLEM, is it possible to compare tables?
         duk_pop_2(state);
     } else {
         detail::_get_metatable(state, type);

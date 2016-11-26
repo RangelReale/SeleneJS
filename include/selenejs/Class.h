@@ -144,7 +144,7 @@ public:
         _register_dtor(state);
         _register_ctor(state);
         _register_members(state, members...);
-		// POSSIBLE PROBLEM
+		//// is this a lua only quirk?
         //duk_dup(state, -1);
 		//duk_put_prop_string(state, -1, "__index"); 
     }

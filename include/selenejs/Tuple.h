@@ -1,7 +1,7 @@
 #pragma once
 
 #include <tuple>
-//#include "Selector.h"
+#include "Selector.h"
 
 namespace seljs {
 template <typename... T>

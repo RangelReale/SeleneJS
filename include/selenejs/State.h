@@ -10,9 +10,6 @@
 #include "util.h"
 #include <vector>
 
-//// Selector.h
-#include "ResourceHandler.h"
-
 namespace seljs {
 class State {
 private:
@@ -23,7 +20,7 @@ private:
 
 public:
     State() : _l(nullptr), _l_owner(true), _exception_handler(new ExceptionHandler) {
-        _l = duk_create_heap_default();
+        _l = duk_create_heap(NULL, NULL, NULL, NULL, &fatal_function);
         if (_l == nullptr) throw 0;
         _registry.reset(new Registry(_l));
         HandleExceptionsPrintingToStdOut();
@@ -62,14 +59,13 @@ public:
 
     bool Load(const std::string &file) {
         ResetStackOnScopeExit savedStack(_l);
-		if (duk_peval_file(_l, file.c_str()) == 0) {
+		duk_int_t status = duk_peval_file(_l, file.c_str());
+		if (status == 0) {
             return true;
         }
 
-		/*
-        const char *msg = lua_tostring(_l, -1);
-        _exception_handler->Handle(status, msg ? msg : file + ": dofile failed");
-		*/
+        const char *msg = duk_safe_to_string(_l, -1);
+        _exception_handler->Handle(status, msg ? msg : file + ": Load failed");
         return false;
     }
 
@@ -88,12 +84,14 @@ public:
 
     bool operator()(const char *code) {
         ResetStackOnScopeExit savedStack(_l);
-		if (duk_peval_string(_l, code) != 0) {
-			throw TypeError{ duk_safe_to_string(_l, -1) }; // TEMP
-			//_exception_handler->Handle_top_of_stack(status, _l);
-            return false;
-        }
-        return true;
+		duk_int_t status = duk_peval_string(_l, code);
+		if (status == 0) {
+			return true;
+		}
+
+		const char *msg = duk_safe_to_string(_l, -1);
+		_exception_handler->Handle(status, msg ? msg : ": Load string failed");
+		return false;
     }
     void ForceGC() {
         duk_gc(_l, 0);

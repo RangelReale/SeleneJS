@@ -30,7 +30,7 @@ struct function_base {
         const auto status = duk_pcall(_state, num_args);
 
         if (status != DUK_EXEC_SUCCESS  && _exception_handler) {
-            //_exception_handler->Handle_top_of_stack(status, _state);
+            _exception_handler->Handle_top_of_stack(status, _state);
         }
     }
 

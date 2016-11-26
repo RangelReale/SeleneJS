@@ -36,18 +36,18 @@ inline duk_ret_t _js_dispatcher(duk_context *l) {
     } catch (std::exception & e) {
         duk_push_string(l, e.what());
         Traceback(l);
-        //store_current_exception(l, duk_to_string(l, -1));
+        store_current_exception(l, duk_to_string(l, -1));
     } catch (...) {
         duk_push_string(l, "<Unknown exception>");
         Traceback(l);
-        //store_current_exception(l, duk_to_string(l, -1));
+        store_current_exception(l, duk_to_string(l, -1));
     }
 
     if(raiseParameterConversionError) {
         raiseParameterConversionError(l, erroneousParameterIndex);
     }
     else if(wrong_meta_table) {
-		// POSSIBLE PROBLEM
+		// don't know if this is right
         duvL_checkudata(l, erroneousParameterIndex, wrong_meta_table);
     }
 

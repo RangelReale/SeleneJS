@@ -144,7 +144,7 @@ private:
         //duk_remove(_state, handler_index - 1);
 
         if (statusCode != DUK_EXEC_SUCCESS) {
-            //_exception_handler->Handle_top_of_stack(statusCode, _state);
+            _exception_handler->Handle_top_of_stack(statusCode, _state);
         }
     }
 public:
@@ -351,7 +351,7 @@ public:
         return detail::_pop(detail::_id<std::string>{}, _state);
     }
 
-    /*template <typename R, typename... Args>
+    template <typename R, typename... Args>
     operator seljs::function<R(Args...)>() {
         ResetStackOnScopeExit save(_state);
         _evaluate_retrieve(1);
@@ -359,7 +359,7 @@ public:
                                 _state);
         ret._enable_exception_handler(_exception_handler);
         return ret;
-    }*/
+    }
 
     // Chaining operators. If the selector is an rvalue, modify in
     // place. Otherwise, create a new Selector and return it.

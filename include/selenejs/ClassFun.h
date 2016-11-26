@@ -15,7 +15,7 @@ private:
     std::string _metatable_name;
 
     T *_get(duk_context *state) {
-		// get obj from "this" binding
+		// get obj from "this" bindind
 		duk_get_prop_string(state, -2, "\xFF" "_obj");
 		T *ret = (T *)duk_get_buffer(state, -1, NULL);
 		duk_pop(state);
@@ -39,6 +39,7 @@ public:
     }
 
     int Apply(duk_context *l) {
+		// "this" is at index -2
         std::tuple<T*> t = std::make_tuple(_get(l));
         std::tuple<Args...> args = detail::_get_args<Args...>(l);
         std::tuple<T*, Args...> pack = std::tuple_cat(t, args);
@@ -80,7 +81,8 @@ public:
     }
 
     int Apply(duk_context *l) {
-        std::tuple<T*> t = std::make_tuple(_get(l));
+		// "this" is at index -2
+		std::tuple<T*> t = std::make_tuple(_get(l));
         std::tuple<Args...> args = detail::_get_args<Args...>(l);
         std::tuple<T*, Args...> pack = std::tuple_cat(t, args);
         detail::_lift(_fun, pack);
