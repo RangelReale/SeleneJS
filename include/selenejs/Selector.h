@@ -355,7 +355,7 @@ public:
     operator seljs::function<R(Args...)>() {
         ResetStackOnScopeExit save(_state);
         _evaluate_retrieve(1);
-        auto ret = detail::_pop(detail::_id<sel::function<R(Args...)>>{},
+        auto ret = detail::_pop(detail::_id<seljs::function<R(Args...)>>{},
                                 _state);
         ret._enable_exception_handler(_exception_handler);
         return ret;
