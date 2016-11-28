@@ -24,6 +24,12 @@ add_executable(test_runner ${CMAKE_CURRENT_SOURCE_DIR}/test/Test.cpp ${headers}
     ../duktape/duktape.h
     ../duktape/duk_config.h
 )
+
+add_executable(example_runner ${CMAKE_CURRENT_SOURCE_DIR}/example/Test.cpp ${headers}
+    ../duktape/duktape.c
+    ../duktape/duktape.h
+    ../duktape/duk_config.h
+)
+
 SET_SOURCE_FILES_PROPERTIES( ../duktape/duktape.c PROPERTIES LANGUAGE CXX )
 
-target_link_libraries(test_runner ${LUA_LIBRARIES})

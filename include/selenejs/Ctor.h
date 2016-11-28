@@ -16,11 +16,8 @@ public:
          const std::string &metatable_name,
 		 const std::string &class_name)
          : _ctor([metatable_name](duk_context *state, Args... args) {
-			// put obj in _obj property
-			duk_push_object(state);
-            void *addr = duk_push_fixed_buffer(state, sizeof(T));
-            new(addr) T(args...);
-			duk_put_prop_string(state, -2, "\xFF" "_obj");
+			void *addr = static_cast<void*>(new T(args...));
+			duv_push_obj_ptr(state, addr);
             duvL_setmetatable(state, metatable_name.c_str());
            }) {
 		duv_push_c_function_ptr(l, &detail::_js_dispatcher, DUK_VARARGS, (void *)static_cast<BaseFun *>(this));

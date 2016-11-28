@@ -18,7 +18,7 @@ public:
     }
 
     int Apply(duk_context *l) {
-        T *t = (T *)duvL_checkudata(l, 1, _metatable_name.c_str());
+		T *t = (T *)duv_get_obj_ptr(l, 0);
         t->~T();
         return 0;
     }

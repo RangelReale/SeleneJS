@@ -27,28 +27,28 @@ private:
 
 bool test_load_error(seljs::State &state) {
     CapturedStdout capture;
-    const char* expected = "cannot open";
+    const char* expected = "no sourcecode";
     return !state.Load("../test/non_exist.js")
         && capture.Content().find(expected) != std::string::npos;
 }
 
 bool test_load_syntax_error(seljs::State &state) {
-    const char* expected = "unexpected symbol";
+    const char* expected = "unterminated statement";
     CapturedStdout capture;
     return !state.Load("../test/test_syntax_error.js")
         && capture.Content().find(expected) != std::string::npos;
 }
 
 bool test_do_syntax_error(seljs::State &state) {
-    const char* expected = "unexpected symbol";
+    const char* expected = "unterminated statement";
     CapturedStdout capture;
-    return !state("function syntax_error() 1 2 3 4 end")
+    return !state("function syntax_error() { 1 2 3 4 }")
         && capture.Content().find(expected) != std::string::npos;
 }
 
 bool test_call_undefined_function(seljs::State &state) {
     state.Load("../test/test_error.js");
-    const char* expected = "attempt to call a nil value";
+    const char* expected = "undefined not callable";
     CapturedStdout capture;
     state["undefined_function"]();
     return capture.Content().find(expected) != std::string::npos;
@@ -56,11 +56,7 @@ bool test_call_undefined_function(seljs::State &state) {
 
 bool test_call_undefined_function2(seljs::State &state) {
     state.Load("../test/test_error.js");
-#if LUA_VERSION_NUM < 503
-    const char* expected = "attempt to call global 'err_func2'";
-#else
-    const char* expected = "attempt to call a nil value (global 'err_func2')";
-#endif
+    const char* expected = "identifier 'err_func2' undefined";
     CapturedStdout capture;
     state["err_func1"](1, 2);
     return capture.Content().find(expected) != std::string::npos;
@@ -68,7 +64,7 @@ bool test_call_undefined_function2(seljs::State &state) {
 
 bool test_call_stackoverflow(seljs::State &state) {
     state.Load("../test/test_error.js");
-    const char* expected = "test_error.js:10: stack overflow";
+    const char* expected = "callstack limit";
     CapturedStdout capture;
     state["do_overflow"]();
     return capture.Content().find(expected) != std::string::npos;
@@ -76,7 +72,7 @@ bool test_call_stackoverflow(seljs::State &state) {
 
 bool test_parameter_conversion_error(seljs::State &state) {
     const char * expected =
-        "bad argument #2 to 'accept_string_int_string' (number expected, got string)";
+        "number required, found 'not a number'";
     std::string largeStringToPreventSSO(50, 'x');
     state["accept_string_int_string"] = [](std::string, int, std::string){};
 

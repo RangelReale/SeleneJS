@@ -50,42 +50,71 @@ inline bool check(duk_context *L, int code) {
     }
 }
 
-inline int Traceback(duk_context *L) {
-    // Make nil and values not convertible to string human readable.
-	/*
-    const char* msg = "<not set>";
-    if (!lua_isnil(L, -1)) {
-        msg = lua_tostring(L, -1);
-        if (!msg)
-            msg = "<error object>";
-    }
-    lua_pushstring(L, msg);
-
-    // call debug.traceback
-    lua_getglobal(L, "debug");
-    lua_getfield(L, -1, "traceback");
-    lua_pushvalue(L, -3);
-    lua_pushinteger(L, 2);
-    lua_call(L, 2, 1);
-	*/
-    return 1;
-}
-
-inline duk_ret_t ErrorHandler(duk_context *L) {
-    if(test_stored_exception(L) != nullptr) {
-        return 1;
-    }
-
-    return Traceback(L);
-}
-
-inline int SetErrorHandler(duk_context *L) {
-	duk_push_c_function(L, &ErrorHandler, 1);
-    return duk_get_top(L);
+// gets message and possible traceback from Error object
+std::string ErrorMessage(duk_context *L, duk_idx_t index) {
+	std::string ret;
+	// TODO: check if index is really an error object
+	// gets the "stack" property of the Error object
+	duk_get_prop_string(L, index, "stack");
+	if (duk_is_string(L, -1)) {
+		size_t size;
+		const char *buff = duk_get_lstring(L, -1, &size);
+		ret = std::string{ buff, size };
+		duk_pop(L);
+	}
+	else 
+	{
+		duk_pop(L);
+		// gets message from object using ToString()
+		ret = duk_safe_to_string(L, index);
+	}
+	return ret;
 }
 
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args) {
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
+
+duk_idx_t duv_push_c_function_ptr(duk_context *ctx, duk_c_function func, duk_idx_t nargs, void *ptr)
+{
+	duk_idx_t ret = duk_push_c_function(ctx, func, nargs);
+	// push object into hidden property
+	duk_push_pointer(ctx, ptr);
+	// put into function property
+	duk_put_prop_string(ctx, -2, "\xFF" "_func_obj");
+	return ret;
+}
+
+void * duv_get_c_function_ptr(duk_context *ctx, duk_idx_t index)
+{
+	duk_get_prop_string(ctx, index, "\xFF" "_func_obj");
+	void* ptr = duk_get_pointer(ctx, -1);
+	duk_pop(ctx);
+	return ptr;
+}
+
+void duv_push_obj_ptr(duk_context *ctx, void *ptr)
+{
+	duk_push_object(ctx);
+	duk_push_pointer(ctx, ptr);
+	duk_put_prop_string(ctx, -2, "\xFF" "_obj");
+}
+
+void *duv_get_obj_ptr(duk_context *ctx, duk_idx_t index)
+{
+	duk_get_prop_string(ctx, index, "\xFF" "_obj");
+	void* ptr = duk_get_pointer(ctx, -1);
+	duk_pop(ctx);
+	return ptr;
+}
+
+void *duv_require_obj_ptr(duk_context *ctx, duk_idx_t index)
+{
+	duk_get_prop_string(ctx, index, "\xFF" "_obj");
+	void* ptr = duk_require_pointer(ctx, -1);
+	duk_pop(ctx);
+	return ptr;
+}
+
 }

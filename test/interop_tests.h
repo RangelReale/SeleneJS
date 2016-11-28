@@ -134,7 +134,7 @@ bool test_return_value(seljs::State &state) {
     state["return_value"] = &return_value;
     int const instanceCountBeforeCreation = InstanceCounter::instances;
 
-    state("globalValue = return_value()");
+	state("globalValue = return_value();");
 
     return InstanceCounter::instances == instanceCountBeforeCreation + 1;
 }
@@ -149,7 +149,7 @@ bool test_return_unregistered_type(seljs::State &state) {
         error_encounted = true;
     });
 
-    state("globalValue = return_value()");
+	state("globalValue = return_value();");
 
     return error_encounted;
 }
@@ -157,7 +157,7 @@ bool test_return_unregistered_type(seljs::State &state) {
 bool test_value_parameter(seljs::State &state) {
     using namespace test_lifetime;
     state["MyClass"].SetClass<InstanceCounter>();
-    state("function acceptValue(value) valCopy = value end");
+	state("function acceptValue(value) { valCopy = value; }");
     int const instanceCountBefore = InstanceCounter::instances;
 
     state["acceptValue"](InstanceCounter{});
@@ -168,7 +168,7 @@ bool test_value_parameter(seljs::State &state) {
 bool test_wrong_value_parameter(seljs::State &state) {
     using namespace test_lifetime;
     state["MyClass"].SetClass<InstanceCounter>();
-    state("function acceptValue(value) valCopy = value end");
+	state("function acceptValue(value) { valCopy = value; }");
     int const instanceCountBefore = InstanceCounter::instances;
 
     try {
@@ -184,7 +184,7 @@ bool test_wrong_value_parameter(seljs::State &state) {
 bool test_value_parameter_keeps_type_info(seljs::State &state) {
     using namespace test_lifetime;
     state["MyClass"].SetClass<Special>();
-    state("function acceptValue(value) valCopy = value end");
+	state("function acceptValue(value) { valCopy = value; }");
     state["acceptValue"](Special{});
 
     Special * foo = state["valCopy"];
@@ -195,7 +195,7 @@ bool test_value_parameter_keeps_type_info(seljs::State &state) {
 bool test_callback_with_value(seljs::State &state) {
     using namespace test_lifetime;
     state["MyClass"].SetClass<InstanceCounter>();
-    state("val = MyClass.new()");
+	state("val = new MyClass.MyClass();");
 
     std::unique_ptr<InstanceCounter> copy;
     state["accept"] = [&copy](InstanceCounter counter) {
@@ -203,7 +203,7 @@ bool test_callback_with_value(seljs::State &state) {
     };
 
     int const instanceCountBeforeCall = InstanceCounter::instances;
-    state("accept(val)");
+    state("accept(val);");
 
     return InstanceCounter::instances == instanceCountBeforeCall + 1;
 }
@@ -212,8 +212,8 @@ bool test_nullptr_to_nil(seljs::State &state) {
     state["getNullptr"] = []() -> void* {
         return nullptr;
     };
-    state("x = getNullptr()");
-    state("result = x == nil");
+	state("x = getNullptr();");
+	state("result = x == null;");
     return static_cast<bool>(state["result"]);
 }
 

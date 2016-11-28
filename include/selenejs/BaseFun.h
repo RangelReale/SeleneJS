@@ -33,21 +33,21 @@ inline duk_ret_t _js_dispatcher(duk_context *l) {
         wrong_meta_table = duk_push_lstring(
             l, e.metatable_name.c_str(), e.metatable_name.length());
         erroneousParameterIndex = e.index;
-    } catch (std::exception & e) {
-        duk_push_string(l, e.what());
-        Traceback(l);
-        store_current_exception(l, duk_to_string(l, -1));
+    } catch (std::exception &) {
+        //duk_push_string(l, e.what());
+		//store_current_exception(l, duk_to_string(l, -1));
+		throw;
     } catch (...) {
-        duk_push_string(l, "<Unknown exception>");
-        Traceback(l);
-        store_current_exception(l, duk_to_string(l, -1));
+		//duk_push_string(l, "<Unknown exception>");
+        //store_current_exception(l, duk_to_string(l, -1));
+		throw;
     }
 
     if(raiseParameterConversionError) {
         raiseParameterConversionError(l, erroneousParameterIndex);
     }
     else if(wrong_meta_table) {
-		// don't know if this is right
+		// TODO: don't know if this is right
         duvL_checkudata(l, erroneousParameterIndex, wrong_meta_table);
     }
 

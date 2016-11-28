@@ -126,25 +126,15 @@ private:
     void _evaluate_function_call(int num_ret) const {
         if(!_functor_active) return;
         _functor_active = false;
-        // install handler, and swap(handler, function) on lua stack
-        /*int handler_index = SetErrorHandler(_state);
-        int func_index = handler_index - 1;
-        duk_dup(_state, func_index);
-        duk_copy(_state, handler_index, func_index);
-        duk_replace(_state, handler_index);*/
-        // call lua function with error handler
+        // call js function with error handler
         for(auto const & arg : _functor_arguments) {
             arg.Push(_state);
         }
-		// POSSIBLE PROBLEM
         auto const statusCode =
             duk_pcall(_state, _functor_arguments.size());
 
-        // remove error handler
-        //duk_remove(_state, handler_index - 1);
-
         if (statusCode != DUK_EXEC_SUCCESS) {
-            _exception_handler->Handle_top_of_stack(statusCode, _state);
+			_exception_handler->Handle_top_of_stack(statusCode, _state);
         }
     }
 public:

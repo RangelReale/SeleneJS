@@ -25,8 +25,7 @@ struct function_base {
         _exception_handler = exception_handler;
     }
 
-    void protected_call(int const num_args, int const num_ret,
-                        int const handler_index) {
+    void protected_call(int const num_args) {
         const auto status = duk_pcall(_state, num_args);
 
         if (status != DUK_EXEC_SUCCESS  && _exception_handler) {
@@ -55,12 +54,11 @@ public:
     R operator()(Args... args) {
         ResetStackOnScopeExit save(_state);
 
-        int handler_index = SetErrorHandler(_state);
         _ref.Push(_state);
         detail::_push_n(_state, std::forward<Args>(args)...);
         constexpr int num_args = sizeof...(Args);
 
-        protected_call(num_args, 1, handler_index);
+        protected_call(num_args);
 
         return detail::_get(detail::_id<R>{}, _state, -1);
     }
@@ -77,12 +75,11 @@ public:
     void operator()(Args... args) {
         ResetStackOnScopeExit save(_state);
 
-        int handler_index = SetErrorHandler(_state);
         _ref.Push(_state);
         detail::_push_n(_state, std::forward<Args>(args)...);
         constexpr int num_args = sizeof...(Args);
 
-        protected_call(num_args, 1, handler_index);
+        protected_call(num_args);
     }
 
     using function_base::Push;
@@ -98,13 +95,12 @@ public:
     std::tuple<R...> operator()(Args... args) {
         ResetStackOnScopeExit save(_state);
 
-        int handler_index = SetErrorHandler(_state);
         _ref.Push(_state);
         detail::_push_n(_state, std::forward<Args>(args)...);
         constexpr int num_args = sizeof...(Args);
         constexpr int num_ret = sizeof...(R);
 
-        protected_call(num_args, num_ret, handler_index);
+        protected_call(num_args);
 
         duk_remove(_state, handler_index);
         return detail::_get_n<R...>(_state);

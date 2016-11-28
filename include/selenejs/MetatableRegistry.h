@@ -91,7 +91,11 @@ static inline bool SetMetatable(duk_context *state, TypeID type) {
 	if (duk_is_object(state, -1)) {
         duv_setmetatable(state, -2);
         return true;
-    }
+    } else {
+		// push undefined metatable
+		duv_setmetatable(state, -2);
+		return true;
+	}
 
     duk_pop(state);
     return false;

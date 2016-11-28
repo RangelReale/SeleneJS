@@ -60,13 +60,11 @@ public:
     bool Load(const std::string &file) {
         ResetStackOnScopeExit savedStack(_l);
 		duk_int_t status = duk_peval_file(_l, file.c_str());
-		if (status == 0) {
-            return true;
-        }
-
-        const char *msg = duk_safe_to_string(_l, -1);
-        _exception_handler->Handle(status, msg ? msg : file + ": Load failed");
-        return false;
+		if (status != 0) {
+			_exception_handler->Handle_top_of_stack(status, _l);
+			return false;
+		}
+		return true;
     }
 
     void HandleExceptionsPrintingToStdOut() {
@@ -85,13 +83,11 @@ public:
     bool operator()(const char *code) {
         ResetStackOnScopeExit savedStack(_l);
 		duk_int_t status = duk_peval_string(_l, code);
-		if (status == 0) {
-			return true;
+		if (status != 0) {
+			_exception_handler->Handle_top_of_stack(status, _l);
+			return false;
 		}
-
-		const char *msg = duk_safe_to_string(_l, -1);
-		_exception_handler->Handle(status, msg ? msg : ": Load string failed");
-		return false;
+		return true;
     }
     void ForceGC() {
         duk_gc(_l, 0);

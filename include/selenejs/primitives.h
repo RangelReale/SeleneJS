@@ -53,7 +53,8 @@ using decay_primitive =
 template <typename T>
 inline T* _get(_id<T*>, duk_context *l, const int index) {
     if(MetatableRegistry::IsType(l, typeid(T), index)) {
-        return (T*)duk_to_pointer(l, index);
+		T* ret = (T*)duv_get_obj_ptr(l, index);
+		return ret;
     }
     return nullptr;
 }
@@ -67,7 +68,7 @@ inline T& _get(_id<T&>, duk_context *l, const int index) {
         };
     }
 
-    T *ptr = (T*)duk_to_pointer(l, index);
+    T *ptr = (T*)duv_get_obj_ptr(l, index);
     if(ptr == nullptr) {
         throw TypeError{MetatableRegistry::GetTypeName(l, typeid(T))};
     }
@@ -118,7 +119,7 @@ struct GetParameterFromJSTypeError {
 template <typename T>
 inline T* _check_get(_id<T*>, duk_context *l, const int index) {
     MetatableRegistry::CheckType(l, typeid(T), index);
-    return (T *)duk_to_pointer(l, index);
+	return (T*)duv_require_obj_ptr(l, index);
 }
 
 template <typename T>
@@ -153,23 +154,28 @@ inline T _check_get(_id<T&&>, duk_context *l, const int index) {
 
 
 inline int _check_get(_id<int>, duk_context *l, const int index) {
-	return static_cast<int>(duk_to_int(l, index));
+	//return static_cast<int>(duk_to_int(l, index));
+	return static_cast<int>(duk_require_int(l, index));
 }
 
 inline unsigned int _check_get(_id<unsigned int>, duk_context *l, const int index) {
-	return static_cast<unsigned int>(duk_to_uint(l, index));
+	//return static_cast<unsigned int>(duk_to_uint(l, index));
+	return static_cast<unsigned int>(duk_require_uint(l, index));
 }
 
 inline duk_double_t _check_get(_id<duk_double_t>, duk_context *l, const int index) {
-	return static_cast<duk_double_t>(duk_to_number(l, index));
+	//return static_cast<duk_double_t>(duk_to_number(l, index));
+	return static_cast<duk_double_t>(duk_require_number(l, index));
 }
 
 inline bool _check_get(_id<bool>, duk_context *l, const int index) {
-    return duk_to_boolean(l, index) != 0;
+    //return duk_to_boolean(l, index) != 0;
+	return duk_require_boolean(l, index) != 0;
 }
 
 inline std::string _check_get(_id<std::string>, duk_context *l, const int index) {
     size_t size = 0;
+	/*
     char const * buff = duk_to_lstring(l, index, &size);
     if(buff == nullptr) {
         throw GetParameterFromJSTypeError{
@@ -177,7 +183,9 @@ inline std::string _check_get(_id<std::string>, duk_context *l, const int index)
             index
         };
     }
-    return std::string{buff, size};
+	*/
+	char const * buff = duk_require_lstring(l, index, &size);
+	return std::string{buff, size};
 }
 
 // Worker type-trait struct to _get_n
@@ -235,7 +243,7 @@ inline void _push(duk_context *l, T* t) {
     duk_push_null(l);
   }
   else {
-	duk_push_pointer(l, t);
+	duv_push_obj_ptr(l, t);
     MetatableRegistry::SetMetatable(l, typeid(T));
   }
 }
@@ -245,8 +253,8 @@ inline typename std::enable_if<
     !is_primitive<typename std::decay<T>::type>::value
 >::type
 _push(duk_context *l, T& t) {
-	duk_push_pointer(l, &t);
-    MetatableRegistry::SetMetatable(l, typeid(T));
+	duv_push_obj_ptr(l, &t);
+	MetatableRegistry::SetMetatable(l, typeid(T));
 }
 
 template <typename T>
@@ -260,9 +268,9 @@ _push(duk_context *l, T&& t) {
         throw CopyUnregisteredType(typeid(t));
     }
 
-    void *addr = duk_push_fixed_buffer(l, sizeof(T));
-    new(addr) T(std::forward<T>(t));
-    MetatableRegistry::SetMetatable(l, typeid(T));
+	void *addr = static_cast<void*>(new T(std::forward<T>(t)));
+	duv_push_obj_ptr(l, addr);
+	MetatableRegistry::SetMetatable(l, typeid(T));
 }
 
 inline void _push(duk_context *l, bool b) {

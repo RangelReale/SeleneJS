@@ -12,7 +12,10 @@ void duv_setmetatable(duk_context *ctx, duk_idx_t index)
 int duv_getmetatable(duk_context *ctx, duk_idx_t index)
 {
 	duk_get_prototype(ctx, index);
-	return 1;
+	int ret = duk_is_undefined(ctx, -1)?0:1;
+	if (ret == 0) 
+		duk_pop(ctx);
+	return ret;
 }
 
 const char *duv_typename(duk_context *ctx, duk_int_t tp)
@@ -31,24 +34,6 @@ const char *duv_typename(duk_context *ctx, duk_int_t tp)
 	case DUK_TYPE_LIGHTFUNC: return "LIGHTFUNC";
 	}
 	return "NONE";
-}
-
-duk_idx_t duv_push_c_function_ptr(duk_context *ctx, duk_c_function func, duk_idx_t nargs, void *ptr)
-{
-	duk_idx_t ret = duk_push_c_function(ctx, func, nargs);
-	// push object into hidden property
-	duk_push_pointer(ctx, ptr);
-	// put into function property
-	duk_put_prop_string(ctx, -2, "\xFF" "_func_obj");
-	return ret;
-}
-
-void * duv_get_c_function_ptr(duk_context *ctx, duk_idx_t index)
-{
-	duk_get_prop_string(ctx, index, "\xFF" "_func_obj");
-	void* ptr = duk_get_pointer(ctx, -1);
-	duk_pop(ctx);
-	return ptr;
 }
 
 }
