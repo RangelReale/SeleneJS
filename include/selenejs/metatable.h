@@ -11,6 +11,9 @@ void duv_setmetatable(duk_context *ctx, duk_idx_t index)
 
 int duv_getmetatable(duk_context *ctx, duk_idx_t index)
 {
+	if (!duk_is_object(ctx, index))
+		return 0;
+
 	duk_get_prototype(ctx, index);
 	int ret = duk_is_undefined(ctx, -1)?0:1;
 	if (ret == 0) 

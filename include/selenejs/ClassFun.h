@@ -16,9 +16,7 @@ private:
 
     T *_get(duk_context *state) {
 		// get obj from "this" bindind
-		duk_get_prop_string(state, -2, "\xFF" "_obj");
-		T *ret = (T *)duk_get_buffer(state, -1, NULL);
-		duk_pop(state);
+		T *ret = (T *)duv_get_obj_ptr(state, -2);
         return ret;
     }
 
@@ -58,9 +56,7 @@ private:
 
     T *_get(duk_context *state) {
 		// get obj from "this" binding
-		duk_get_prop_string(state, -2, "\xFF" "_obj");
-		T *ret = (T *)duk_get_buffer(state, -1, NULL);
-		duk_pop(state);
+		T *ret = (T *)duv_get_obj_ptr(state, -2);
 		return ret;
     }
 

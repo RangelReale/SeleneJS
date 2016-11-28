@@ -66,7 +66,7 @@ bool test_register_obj_const_member_variable(seljs::State &state) {
     Foo foo_instance(1);
     state["foo_instance"].SetObj(foo_instance, "y", &Foo::y);
     const int answer = state["foo_instance"]["y"]();
-    state("tmp = foo_instance.set_y == nil");
+	state("tmp = foo_instance.set_y == null;");
     return answer == 3 && state["tmp"];
 }
 
@@ -116,8 +116,8 @@ bool test_obj_member_return_pointer(seljs::State &state) {
     state["Foo"].SetClass<Foo, int>("get", &Foo::GetX);
     FooHolder fh{4};
     state["fh"].SetObj(fh, "get", &FooHolder::getPtr);
-    state("foo = fh:get()");
-    state("foox = foo:get()");
+	state("foo = fh.get();");
+	state("foox = foo.get();");
     return state["foox"] == 4;
 }
 
@@ -125,8 +125,8 @@ bool test_obj_member_return_ref(seljs::State &state) {
     state["Foo"].SetClass<Foo, int>("get", &Foo::GetX);
     FooHolder fh{4};
     state["fh"].SetObj(fh, "get", &FooHolder::getRef);
-    state("foo = fh:get()");
-    state("foox = foo:get()");
+	state("foo = fh.get();");
+	state("foox = foo.get();");
     return state["foox"] == 4;
 }
 
@@ -134,8 +134,8 @@ bool test_obj_member_return_val(seljs::State &state) {
     state["Foo"].SetClass<Foo, int>("get", &Foo::GetX);
     FooHolder fh{4};
     state["fh"].SetObj(fh, "get", &FooHolder::getValue);
-    state("foo = fh:get()");
-    state("foox = foo:get()");
+	state("foo = fh.get();");
+	state("foox = foo.get();");
     return state["foox"] == 4;
 }
 
@@ -144,13 +144,13 @@ bool test_obj_member_wrong_type(seljs::State &state) {
     state["Bar"].SetClass<ObjBar>();
     FooHolder fh{5};
     state["fh"].SetObj(fh, "acceptFoo", &FooHolder::acceptFoo);
-    state("bar = Bar.new()");
+	state("bar = new Bar.Bar();");
 
     bool error_encounted = false;
     state.HandleExceptionsWith([&error_encounted](int, std::string, std::exception_ptr) {
         error_encounted = true;
     });
 
-    state("fh.acceptFoo(bar)");
+	state("fh.acceptFoo(bar);");
     return error_encounted;
 }
