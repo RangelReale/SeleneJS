@@ -87,6 +87,14 @@ inline bool _get(_id<bool>, duk_context *l, const int index) {
     return duk_to_boolean(l, index) != 0;
 }
 
+inline char _get(_id<char>, duk_context *l, const int index) {
+	return static_cast<char>(duk_to_int(l, index));
+}
+
+inline unsigned char _get(_id<unsigned char>, duk_context *l, const int index) {
+	return static_cast<unsigned char>(duk_to_uint(l, index));
+}
+
 inline int _get(_id<int>, duk_context *l, const int index) {
     return static_cast<int>(duk_to_int(l, index));
 }

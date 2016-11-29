@@ -338,6 +338,18 @@ public:
         return detail::_pop(detail::_id<bool>{}, _state);
     }
 
+	operator char() const {
+		ResetStackOnScopeExit save(_state);
+		_evaluate_retrieve(1);
+		return detail::_pop(detail::_id<char>{}, _state);
+	}
+
+	operator unsigned char() const {
+		ResetStackOnScopeExit save(_state);
+		_evaluate_retrieve(1);
+		return detail::_pop(detail::_id<unsigned char>{}, _state);
+	}
+
     operator int() const {
         ResetStackOnScopeExit save(_state);
         _evaluate_retrieve(1);
@@ -382,6 +394,12 @@ public:
 		ResetStackOnScopeExit save(_state);
 		_evaluate_retrieve(1);
 		return duk_is_null(_state, -1);
+	}
+
+	bool hasKey(const std::string& name) const {
+		ResetStackOnScopeExit save(_state);
+		_evaluate_retrieve(1);
+		return duk_is_object(_state, -1) && duk_has_prop_string(_state, -1, name.c_str());
 	}
 
     // Chaining operators. If the selector is an rvalue, modify in
