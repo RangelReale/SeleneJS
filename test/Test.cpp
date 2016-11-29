@@ -112,7 +112,7 @@ static TestMap tests = {
     {"test_selector_get_wrong_ref_to_table", test_selector_get_wrong_ref_to_table},
     {"test_selector_get_wrong_ref_to_unregistered", test_selector_get_wrong_ref_to_unregistered},
     {"test_selector_get_wrong_ptr", test_selector_get_wrong_ptr},
-	{ "test_selector_get_jsref", test_selector_get_jsref },
+	{"test_selector_get_jsref", test_selector_get_jsref},
 
     {"test_register_class", test_register_class},
     {"test_get_member_variable", test_get_member_variable},

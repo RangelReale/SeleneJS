@@ -372,6 +372,18 @@ public:
         return ret;
     }
 
+	bool isUndefined() const {
+		ResetStackOnScopeExit save(_state);
+		_evaluate_retrieve(1);
+		return duk_is_undefined(_state, -1);
+	}
+
+	bool isNull() const {
+		ResetStackOnScopeExit save(_state);
+		_evaluate_retrieve(1);
+		return duk_is_null(_state, -1);
+	}
+
     // Chaining operators. If the selector is an rvalue, modify in
     // place. Otherwise, create a new Selector and return it.
 #ifdef HAS_REF_QUALIFIERS
