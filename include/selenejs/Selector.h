@@ -285,6 +285,13 @@ public:
 		});
 	}
 
+	template <typename T>
+	void SetClassObj(T &t) {
+		_evaluate_store([this, &t]() {
+			_registry->RegisterClassObj(t);
+		});
+	}
+
     template <typename... Ret>
     std::tuple<Ret...> GetTuple() const {
         ResetStackOnScopeExit save(_state);

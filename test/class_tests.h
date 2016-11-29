@@ -85,8 +85,8 @@ bool test_register_class(seljs::State &state) {
 
 bool test_register_class_custom(seljs::State &state) {
 	state["Bar"].SetClassCustom<Bar, seljs::CtorNull<Bar>, seljs::DtorNull<Bar>>("print", &Bar::Print, "get_x", &Bar::GetX);
-	Bar bfoo(10);
-	state["bar"].SetObj(bfoo);
+	Bar bfoo(8);
+	state["bar"].SetClassObj(bfoo);
 	state("barx = bar.get_x();");
 	state("barp = bar.print(2);");
 	int result1 = state["barx"];
