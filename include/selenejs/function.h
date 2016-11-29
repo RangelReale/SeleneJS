@@ -98,11 +98,9 @@ public:
         _ref.Push(_state);
         detail::_push_n(_state, std::forward<Args>(args)...);
         constexpr int num_args = sizeof...(Args);
-        constexpr int num_ret = sizeof...(R);
 
         protected_call(num_args);
 
-        duk_remove(_state, handler_index);
         return detail::_get_n<R...>(_state);
     }
 
