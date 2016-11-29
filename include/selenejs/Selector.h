@@ -418,6 +418,25 @@ public:
 		return duk_is_object(_state, -1) && duk_has_prop_string(_state, -1, name.c_str());
 	}
 
+	int length() const {
+		ResetStackOnScopeExit save(_state);
+		_evaluate_retrieve(1);
+		return duk_get_length(_state, -1);
+	}
+
+	std::vector<std::string> keyList(duk_uint_t enum_flags = 0) const {
+		ResetStackOnScopeExit save(_state);
+		_evaluate_retrieve(1);
+		std::vector<std::string> ret;
+		duk_enum(_state, -1, enum_flags);
+		while (duk_next(_state, -1, 0)) {
+			ret.push_back(std::string(duk_get_string(_state, -1)));
+			duk_pop(_state);
+		}
+		duk_pop(_state); // enum
+		return ret;
+	}
+
     // Chaining operators. If the selector is an rvalue, modify in
     // place. Otherwise, create a new Selector and return it.
 #ifdef HAS_REF_QUALIFIERS

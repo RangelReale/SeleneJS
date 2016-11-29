@@ -84,6 +84,25 @@ bool test_create_table_index(seljs::State &state) {
     return state["new_table"][3] == 4;
 }
 
+bool test_loop_array(seljs::State &state) {
+	state("my_array = [10, 20, 30];");
+	int sum = 0;
+	for (int i = 0; i < state["my_array"].length(); i++) {
+		sum = sum + state["my_array"][i].operator int();
+	}
+	return sum == 60;
+}
+
+bool test_loop_table(seljs::State &state) {
+	state("my_table = {a: 10, b: 20, c: 30};");
+	int sum = 0;
+	auto keys = state["my_table"].keyList();
+	for (auto key : keys) {
+		sum = sum + state["my_table"][key].operator int();
+	}
+	return sum == 60;
+}
+
 bool test_cache_selector_field_assignment(seljs::State &state) {
     seljs::Selector s = state["new_table"][3];
     s = 4;
