@@ -4,12 +4,12 @@
 
 namespace seljs {
 
-void duv_setmetatable(duk_context *ctx, duk_idx_t index)
+inline void duv_setmetatable(duk_context *ctx, duk_idx_t index)
 {
 	duk_set_prototype(ctx, index);
 }
 
-int duv_getmetatable(duk_context *ctx, duk_idx_t index)
+inline int duv_getmetatable(duk_context *ctx, duk_idx_t index)
 {
 	if (!duk_is_object(ctx, index))
 		return 0;
@@ -21,7 +21,7 @@ int duv_getmetatable(duk_context *ctx, duk_idx_t index)
 	return ret;
 }
 
-const char *duv_typename(duk_context *ctx, duk_int_t tp)
+inline const char *duv_typename(duk_context *ctx, duk_int_t tp)
 {
 	switch (tp)
 	{

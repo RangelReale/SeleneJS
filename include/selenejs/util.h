@@ -51,7 +51,7 @@ inline bool check(duk_context *L, int code) {
 }
 
 // gets message and possible traceback from Error object
-std::string ErrorMessage(duk_context *L, duk_idx_t index) {
+inline std::string ErrorMessage(duk_context *L, duk_idx_t index) {
 	std::string ret;
 	// TODO: check if index is really an error object
 	// gets the "stack" property of the Error object
@@ -76,7 +76,7 @@ std::unique_ptr<T> make_unique(Args&&... args) {
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
-duk_idx_t duv_push_c_function_ptr(duk_context *ctx, duk_c_function func, duk_idx_t nargs, void *ptr)
+inline duk_idx_t duv_push_c_function_ptr(duk_context *ctx, duk_c_function func, duk_idx_t nargs, void *ptr)
 {
 	duk_idx_t ret = duk_push_c_function(ctx, func, nargs);
 	// push object into hidden property
@@ -86,7 +86,7 @@ duk_idx_t duv_push_c_function_ptr(duk_context *ctx, duk_c_function func, duk_idx
 	return ret;
 }
 
-void * duv_get_c_function_ptr(duk_context *ctx, duk_idx_t index)
+inline void * duv_get_c_function_ptr(duk_context *ctx, duk_idx_t index)
 {
 	duk_get_prop_string(ctx, index, "\xFF" "_func_obj");
 	void* ptr = duk_get_pointer(ctx, -1);
@@ -94,14 +94,14 @@ void * duv_get_c_function_ptr(duk_context *ctx, duk_idx_t index)
 	return ptr;
 }
 
-void duv_push_obj_ptr(duk_context *ctx, void *ptr)
+inline void duv_push_obj_ptr(duk_context *ctx, void *ptr)
 {
 	duk_push_object(ctx);
 	duk_push_pointer(ctx, ptr);
 	duk_put_prop_string(ctx, -2, "\xFF" "_obj");
 }
 
-void *duv_get_obj_ptr(duk_context *ctx, duk_idx_t index)
+inline void *duv_get_obj_ptr(duk_context *ctx, duk_idx_t index)
 {
 	duk_get_prop_string(ctx, index, "\xFF" "_obj");
 	void* ptr = duk_get_pointer(ctx, -1);
@@ -109,7 +109,7 @@ void *duv_get_obj_ptr(duk_context *ctx, duk_idx_t index)
 	return ptr;
 }
 
-void *duv_require_obj_ptr(duk_context *ctx, duk_idx_t index)
+inline void *duv_require_obj_ptr(duk_context *ctx, duk_idx_t index)
 {
 	duk_get_prop_string(ctx, index, "\xFF" "_obj");
 	void* ptr = duk_require_pointer(ctx, -1);
