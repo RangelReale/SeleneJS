@@ -80,6 +80,10 @@ public:
         return Selector(_l, *_registry, *_exception_handler, name);
     }
 
+	Selector operator()(JSRef ref) {
+		return Selector(_l, *_registry, *_exception_handler, ref);
+	}
+
     bool operator()(const char *code) {
         ResetStackOnScopeExit savedStack(_l);
 		duk_int_t status = duk_peval_string(_l, code);

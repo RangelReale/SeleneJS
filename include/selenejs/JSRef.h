@@ -29,11 +29,20 @@ public:
         : _ref(new int{ref}, detail::JSRefDeleter{state}) {}
 
     JSRef(duk_context *state)
-        : JSRef(state, DUV_REFNIL)
+        : _ref()
         {}
 
+	JSRef()
+		: _ref()
+	{}
+
+	bool isRef() const {
+		return _ref.operator bool();
+	}
+
     void Push(duk_context *state) const {
-		duv_push_ref(state, *_ref);
+		if (_ref)
+			duv_push_ref(state, *_ref);
     }
 };
 

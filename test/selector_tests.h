@@ -307,3 +307,10 @@ bool test_selector_get_wrong_ptr(seljs::State &state) {
     SelectorFoo * foo = state["bar"];
     return foo == nullptr;
 }
+
+bool test_selector_get_jsref(seljs::State &state) {
+	state("function jsref() { return {msg: 'referece to object'}; }");
+	seljs::JSRef xref = state["jsref"]().asRef();
+	std::string xrefmsg = state(xref)["msg"];
+	return xrefmsg == "referece to object";
+}

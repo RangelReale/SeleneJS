@@ -48,6 +48,9 @@ private:
     ExceptionHandler *_exception_handler;
     std::string _name;
 
+	// Root reference, if not global object
+	JSRef _root;
+
     // Traverses the structure up to this element
     std::vector<JSRef> _traversal;
 
@@ -68,6 +71,10 @@ private:
         : _state(s), _registry(&r), _exception_handler(&eh), _name(name),
           _key(make_Ref(s, name)) {}
 
+	Selector(duk_context *s, Registry &r, ExceptionHandler &eh, JSRef root)
+		: _state(s), _registry(&r), _exception_handler(&eh), _name(), 
+		_key(), _root(root) {}
+
     void _get(JSRef r) const {
         r.Push(_state);
 		duk_get_prop(_state, -2);
@@ -76,7 +83,8 @@ private:
 
     // Pushes this element to the stack
     void _get() const {
-        _get(_key);
+		if (_key.isRef())
+			_get(_key);
     }
 
     // Sets this element from a function that pushes a value to the
@@ -104,9 +112,12 @@ private:
     }
 
     void _traverse() const {
-		duk_push_global_object(_state);
+		if (_root.isRef())
+			_root.Push(_state);
+		else
+			duk_push_global_object(_state);
         for (auto &key : _traversal) {
-            _get(key);
+			_get(key);
         }
     }
 
@@ -272,6 +283,16 @@ public:
         return detail::_get_n<Ret...>(_state);
     }
 
+	JSRef asRef() const {
+		ResetStackOnScopeExit save(_state);
+		_evaluate_retrieve(1);
+		return std::move(JSRef(_state, duv_ref(_state)));
+	}
+
+	operator JSRef&() const {
+		throw std::logic_error("Cannot use implicit operator for JSRef, use asRef()");
+	}
+
     template<
         typename T,
         typename = typename std::enable_if<
@@ -357,7 +378,8 @@ public:
     Selector&& operator[](const std::string& name) && {
         _name += std::string(".") + name;
         _check_create_table();
-        _traversal.push_back(_key);
+		if (_key.isRef())
+			_traversal.push_back(_key);
         _key = make_Ref(_state, name);
         return std::move(*this);
     }
@@ -367,7 +389,8 @@ public:
     Selector&& operator[](const int index) && {
         _name += std::string(".") + std::to_string(index);
         _check_create_table();
-        _traversal.push_back(_key);
+		if (_key.isRef())
+			_traversal.push_back(_key);
         _key = make_Ref(_state, index);
         return std::move(*this);
     }
