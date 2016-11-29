@@ -38,7 +38,7 @@ static TestMap tests = {
     {"test_call_c_function", test_call_c_function},
     {"test_call_c_fun_from_lua", test_call_c_fun_from_lua},
     {"test_no_return", test_no_return},
-    {"test_call_std_fun", test_call_lambda},
+    {"test_call_std_fun", test_call_std_fun},
     {"test_call_lambda", test_call_lambda},
     {"test_call_normal_c_fun", test_call_normal_c_fun},
     {"test_call_normal_c_fun_many_times", test_call_normal_c_fun_many_times},
