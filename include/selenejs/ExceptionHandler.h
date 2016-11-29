@@ -48,7 +48,6 @@ inline void _register_stored_exception_metatable(duk_context * l) {
 
 inline void store_current_exception(duk_context * l, char const * what) {
 	stored_exception* user_data = new stored_exception{ what, std::current_exception() };
-	duk_push_object(l);
     duk_push_pointer(l, static_cast<void*>(user_data));
 	duk_put_prop_string(l, -2, "\xFF" "_exception");
 
@@ -59,21 +58,6 @@ inline void store_current_exception(duk_context * l, char const * what) {
     }
 
     duv_setmetatable(l, -2);
-}
-
-inline void store_current_error(duk_context * l, duk_idx_t index) {
-	stored_exception* user_data = new stored_exception{ ErrorMessage(l, index), NULL };
-	duk_push_object(l);
-	duk_push_pointer(l, static_cast<void*>(user_data));
-	duk_put_prop_string(l, -2, "\xFF" "_exception");
-
-	duvL_getmetatable(l, _stored_exception_metatable_name()->c_str());
-	if (duk_is_undefined(l, -1) != 0) {
-		duk_pop(l);
-		_register_stored_exception_metatable(l);
-	}
-
-	duv_setmetatable(l, -2);
 }
 
 inline stored_exception * test_stored_exception(duk_context *l) {

@@ -3,63 +3,61 @@
 #include <exception>
 #include <duktape.h>
 #include <selenejs.h>
-/*
+
 bool test_catch_exception_from_callback_within_lua(seljs::State &state) {
     state.Load("../test/test_exceptions.js");
     state["throw_logic_error"] =
         []() {throw std::logic_error("Message from C++.");};
-    bool ok = true;
-    std::string msg;
-    seljs::tie(ok, msg) = state["call_protected"]("throw_logic_error");
-    return !ok && msg.find("Message from C++.") != std::string::npos;
+	std::string msg = state["call_protected"]("throw_logic_error");
+	bool ok = state["ok"];
+	return !ok && msg.find("Message from C++.") != std::string::npos;
 }
 
 bool test_catch_unknwon_exception_from_callback_within_lua(seljs::State &state) {
     state.Load("../test/test_exceptions.js");
     state["throw_int"] =
         []() {throw 0;};
-    bool ok = true;
-    std::string msg;
-    seljs::tie(ok, msg) = state["call_protected"]("throw_int");
-    return !ok && msg.find("<Unknown exception>") != std::string::npos;
+	std::string msg = state["call_protected"]("throw_int");
+	bool ok = state["ok"];
+    return !ok && msg.find("invalid c++ exception") != std::string::npos;
 }
 
 bool test_call_exception_handler_for_exception_from_lua(seljs::State &state) {
     state.Load("../test/test_exceptions.js");
-    int luaStatusCode = LUA_OK;
+    int jsStatusCode = 1;
     std::string message;
-    state.HandleExceptionsWith([&luaStatusCode, &message](int s, std::string msg, std::exception_ptr exception) {
-        luaStatusCode = s, message = std::move(msg);
+    state.HandleExceptionsWith([&jsStatusCode, &message](int s, std::string msg, std::exception_ptr exception) {
+        jsStatusCode = s, message = std::move(msg);
     });
-    state["raise"]("Message from Lua.");
-    return luaStatusCode == LUA_ERRRUN
-        && message.find("Message from Lua.") != std::string::npos;
+    state["raise"]("Message from JS.");
+    return jsStatusCode == DUK_EXEC_ERROR
+        && message.find("Message from JS.") != std::string::npos;
 }
 
 bool test_call_exception_handler_for_exception_from_callback(seljs::State &state) {
-    int luaStatusCode = LUA_OK;
+    int jsStatusCode = 1;
     std::string message;
-    state.HandleExceptionsWith([&luaStatusCode, &message](int s, std::string msg, std::exception_ptr exception) {
-        luaStatusCode = s, message = std::move(msg);
+    state.HandleExceptionsWith([&jsStatusCode, &message](int s, std::string msg, std::exception_ptr exception) {
+		jsStatusCode = s, message = std::move(msg);
     });
     state["throw_logic_error"] =
         []() {throw std::logic_error("Message from C++.");};
     state["throw_logic_error"]();
-    return luaStatusCode == LUA_ERRRUN
+    return jsStatusCode == DUK_EXEC_ERROR
         && message.find("Message from C++.") != std::string::npos;
 }
 
 bool test_call_exception_handler_while_using_sel_function(seljs::State &state) {
     state.Load("../test/test_exceptions.js");
-    int luaStatusCode = LUA_OK;
+    int jsStatusCode = 1;
     std::string message;
-    state.HandleExceptionsWith([&luaStatusCode, &message](int s, std::string msg, std::exception_ptr exception) {
-        luaStatusCode = s, message = std::move(msg);
+    state.HandleExceptionsWith([&jsStatusCode, &message](int s, std::string msg, std::exception_ptr exception) {
+		jsStatusCode = s, message = std::move(msg);
     });
     seljs::function<void(std::string)> raiseFromLua = state["raise"];
-    raiseFromLua("Message from Lua.");
-    return luaStatusCode == LUA_ERRRUN
-        && message.find("Message from Lua.") != std::string::npos;
+    raiseFromLua("Message from JS.");
+    return jsStatusCode == DUK_EXEC_ERROR
+        && message.find("Message from JS.") != std::string::npos;
 }
 
 bool test_rethrow_exception_for_exception_from_callback(seljs::State &state) {
@@ -102,8 +100,7 @@ bool test_throw_on_exception_using_Load(seljs::State &state) {
     try {
         state.Load("non_existing_file");
     } catch (std::logic_error & e) {
-        return std::string(e.what()).find("non_existing_file") != std::string::npos;
+        return std::string(e.what()).find("no sourcecode") != std::string::npos;
     }
     return false;
 }
-*/

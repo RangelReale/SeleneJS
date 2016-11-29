@@ -22,7 +22,7 @@ static TestMap tests = {
     {"test_call_undefined_function2", test_call_undefined_function2},
     {"test_call_stackoverflow", test_call_stackoverflow},
     {"test_parameter_conversion_error", test_parameter_conversion_error},
-/*
+
     {"test_catch_exception_from_callback_within_lua", test_catch_exception_from_callback_within_lua},
     {"test_catch_unknwon_exception_from_callback_within_lua", test_catch_unknwon_exception_from_callback_within_lua},
     {"test_call_exception_handler_for_exception_from_lua", test_call_exception_handler_for_exception_from_lua},
@@ -31,7 +31,7 @@ static TestMap tests = {
     {"test_rethrow_exception_for_exception_from_callback", test_rethrow_exception_for_exception_from_callback},
     {"test_rethrow_using_sel_function", test_rethrow_using_sel_function},
     {"test_throw_on_exception_using_Load", test_throw_on_exception_using_Load},
-*/
+
     {"test_function_no_args", test_function_no_args},
     {"test_add", test_add},
     {"test_call_field", test_call_field},

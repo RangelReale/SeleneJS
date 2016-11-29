@@ -33,15 +33,17 @@ inline duk_ret_t _js_dispatcher(duk_context *l) {
         wrong_meta_table = duk_push_lstring(
             l, e.metatable_name.c_str(), e.metatable_name.length());
         erroneousParameterIndex = e.index;
-    } catch (std::exception &) {
-        //duk_push_string(l, e.what());
-		//store_current_exception(l, duk_to_string(l, -1));
-		throw;
+    } catch (std::exception &e) {
+		if (duk_is_error(l, -1) == 0) {
+			duk_push_error_object(l, DUK_ERR_ERROR, e.what());
+		}
+		store_current_exception(l, e.what());
+		duk_throw(l);
     } catch (...) {
-		//duk_push_string(l, "<Unknown exception>");
-        //store_current_exception(l, duk_to_string(l, -1));
-		throw;
-    }
+		if (duk_is_error(l, -1) == 0)
+			throw;
+		duk_throw(l);
+	}
 
     if(raiseParameterConversionError) {
         raiseParameterConversionError(l, erroneousParameterIndex);
