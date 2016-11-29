@@ -115,7 +115,8 @@ static TestMap tests = {
 	{"test_selector_get_jsref", test_selector_get_jsref},
 
     {"test_register_class", test_register_class},
-    {"test_get_member_variable", test_get_member_variable},
+	{"test_register_class_custom", test_register_class_custom},
+	{"test_get_member_variable", test_get_member_variable},
     {"test_set_member_variable", test_set_member_variable},
     {"test_class_field_set", test_class_field_set},
     {"test_class_gc", test_class_gc},

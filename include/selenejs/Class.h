@@ -19,13 +19,14 @@ struct BaseClass {
 
 template <typename T,
           typename A,
+		  typename B,
           typename... Members>
 class Class : public BaseClass {
 private:
     std::string _name;
     std::string _metatable_name;
     std::unique_ptr<A> _ctor;
-    std::unique_ptr<Dtor<T>> _dtor;
+    std::unique_ptr<B> _dtor;
     using Funs = std::vector<std::unique_ptr<BaseFun>>;
     Funs _funs;
 
@@ -34,7 +35,7 @@ private:
     }
 
     void _register_dtor(duk_context *state) {
-        _dtor.reset(new Dtor<T>(state, _metatable_name.c_str()));
+        _dtor.reset(new B(state, _metatable_name.c_str()));
     }
 
     template <typename M>

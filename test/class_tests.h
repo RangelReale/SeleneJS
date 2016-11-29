@@ -83,6 +83,17 @@ bool test_register_class(seljs::State &state) {
     return result1 == 8 && result2 == "8+2";
 }
 
+bool test_register_class_custom(seljs::State &state) {
+	state["Bar"].SetClassCustom<Bar, seljs::CtorNull<Bar>, seljs::DtorNull<Bar>>("print", &Bar::Print, "get_x", &Bar::GetX);
+	Bar bfoo(10);
+	state["bar"].SetObj(bfoo);
+	state("barx = bar.get_x();");
+	state("barp = bar.print(2);");
+	int result1 = state["barx"];
+	std::string result2 = state["barp"];
+	return result1 == 8 && result2 == "8+2";
+}
+
 bool test_get_member_variable(seljs::State &state) {
     state["Bar"].SetClass<Bar, int>("x", &Bar::x);
 	state("bar = new Bar.Bar(-2);");

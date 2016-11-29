@@ -75,8 +75,22 @@ public:
     template <typename T, typename... CtorArgs, typename... Funs>
     void RegisterClassWorker(const std::string &name, Funs... funs) {
         _classes.emplace_back(
-            seljs::make_unique<Class<T, Ctor<T, CtorArgs...>, Funs...>>(
+            seljs::make_unique<Class<T, Ctor<T, CtorArgs...>, Dtor<T>, Funs...>>(
                 _state, name, funs...));
     }
+
+	template <typename T, typename Constructor, typename Destructor, typename... Funs, size_t... N>
+	void RegisterClassCustom(const std::string &name, std::tuple<Funs...> funs,
+		detail::_indices<N...>) {
+		RegisterClassCustomWorker<T, Constructor, Destructor>(name, std::get<N>(funs)...);
+	}
+
+	template <typename T, typename Constructor, typename Destructor, typename... Funs>
+	void RegisterClassCustomWorker(const std::string &name, Funs... funs) {
+		_classes.emplace_back(
+			seljs::make_unique<Class<T, Constructor, Destructor, Funs...>>(
+				_state, name, funs...));
+	}
+
 };
 }

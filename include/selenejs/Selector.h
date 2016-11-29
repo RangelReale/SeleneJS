@@ -276,6 +276,15 @@ public:
         });
     }
 
+	template <typename T, typename Constructor, typename Destructor, typename... Funs>
+	void SetClassCustom(Funs... funs) {
+		auto fun_tuple = std::make_tuple(std::forward<Funs>(funs)...);
+		_evaluate_store([this, &fun_tuple]() {
+			typename detail::_indices_builder<sizeof...(Funs)>::type d;
+			_registry->RegisterClassCustom<T, Constructor, Destructor>(_name, fun_tuple, d);
+		});
+	}
+
     template <typename... Ret>
     std::tuple<Ret...> GetTuple() const {
         ResetStackOnScopeExit save(_state);
@@ -387,13 +396,13 @@ public:
 	bool isUndefined() const {
 		ResetStackOnScopeExit save(_state);
 		_evaluate_retrieve(1);
-		return duk_is_undefined(_state, -1);
+		return duk_is_undefined(_state, -1) != 0;
 	}
 
 	bool isNull() const {
 		ResetStackOnScopeExit save(_state);
 		_evaluate_retrieve(1);
-		return duk_is_null(_state, -1);
+		return duk_is_null(_state, -1) != 0;
 	}
 
 	bool hasKey(const std::string& name) const {
