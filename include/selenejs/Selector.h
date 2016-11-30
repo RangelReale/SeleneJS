@@ -412,6 +412,36 @@ public:
 		return duk_is_null(_state, -1) != 0;
 	}
 
+	bool isNullOrUndefined() const {
+		ResetStackOnScopeExit save(_state);
+		_evaluate_retrieve(1);
+		return duk_is_null_or_undefined(_state, -1) != 0;
+	}
+
+	bool isCallable() const {
+		ResetStackOnScopeExit save(_state);
+		_evaluate_retrieve(1);
+		return duk_is_callable(_state, -1) != 0;
+	}
+
+	bool isObject() const {
+		ResetStackOnScopeExit save(_state);
+		_evaluate_retrieve(1);
+		return duk_is_object(_state, -1) != 0;
+	}
+
+	bool isArray() const {
+		ResetStackOnScopeExit save(_state);
+		_evaluate_retrieve(1);
+		return duk_is_array(_state, -1) != 0;
+	}
+
+	bool isFunction() const {
+		ResetStackOnScopeExit save(_state);
+		_evaluate_retrieve(1);
+		return duk_is_function(_state, -1) != 0;
+	}
+
 	bool hasKey(const std::string& name) const {
 		ResetStackOnScopeExit save(_state);
 		_evaluate_retrieve(1);
