@@ -132,7 +132,7 @@ bool test_function_should_run_once(seljs::State &state) {
 bool test_function_result_is_alive_ptr(seljs::State &state) {
     using namespace test_lifetime;
     state["Obj"].SetClass<InstanceCounter>();
-	state("function createObj() { return new Obj.Obj(); }");
+	state("function createObj() { return new Obj(); }");
     int const instanceCountBeforeCreation = InstanceCounter::instances;
 
     seljs::Pointer<InstanceCounter> pointer = state["createObj"]();
@@ -144,7 +144,7 @@ bool test_function_result_is_alive_ptr(seljs::State &state) {
 bool test_function_result_is_alive_ref(seljs::State &state) {
     using namespace test_lifetime;
     state["Obj"].SetClass<InstanceCounter>();
-	state("function createObj() { return new Obj.Obj(); }");
+	state("function createObj() { return new Obj(); }");
     int const instanceCountBeforeCreation = InstanceCounter::instances;
 
     seljs::Reference<InstanceCounter> reference = state["createObj"]();
@@ -156,7 +156,7 @@ bool test_function_result_is_alive_ref(seljs::State &state) {
 bool test_get_and_set_Reference_keeps_identity(seljs::State &state) {
     using namespace test_lifetime;
     state["Obj"].SetClass<InstanceCounter>();
-	state("objA = new Obj.Obj();");
+	state("objA = new Obj();");
 
     seljs::Reference<InstanceCounter> objA_ref = state["objA"];
     state["objB"] = objA_ref;
@@ -169,7 +169,7 @@ bool test_get_and_set_Reference_keeps_identity(seljs::State &state) {
 bool test_get_and_set_Pointer_keeps_identity(seljs::State &state) {
     using namespace test_lifetime;
     state["Obj"].SetClass<InstanceCounter>();
-	state("objA = new Obj.Obj();");
+	state("objA = new Obj();");
 
     seljs::Pointer<InstanceCounter> objA_ptr = state["objA"];
     state["objB"] = objA_ptr;
@@ -207,7 +207,7 @@ bool test_selector_call_with_wrong_type_ptr(seljs::State &state) {
     state["Foo"].SetClass<SelectorFoo, int>();
     state["Bar"].SetClass<SelectorBar>();
     state["acceptFoo"] = acceptFoo;
-	state("bar = new Bar.Bar();");
+	state("bar = new Bar();");
 
     bool error_encounted = false;
     state.HandleExceptionsWith([&error_encounted](int, std::string, std::exception_ptr) {
@@ -223,7 +223,7 @@ bool test_selector_call_with_wrong_type_ref(seljs::State &state) {
     state["Foo"].SetClass<SelectorFoo, int>();
     state["Bar"].SetClass<SelectorBar>();
     state["acceptFoo"] = acceptFoo;
-	state("bar = new Bar.Bar();");
+	state("bar = new Bar();");
 
     bool error_encounted = false;
     state.HandleExceptionsWith([&error_encounted](int, std::string, std::exception_ptr) {
@@ -265,7 +265,7 @@ bool test_selector_get_nullptr_ref(seljs::State &state) {
 bool test_selector_get_wrong_ref(seljs::State &state) {
     state["Foo"].SetClass<SelectorFoo, int>();
     state["Bar"].SetClass<SelectorBar>();
-	state("bar = new Bar.Bar();");
+	state("bar = new Bar();");
     bool error_encounted = false;
 
     try{
@@ -307,7 +307,7 @@ bool test_selector_get_wrong_ref_to_table(seljs::State &state) {
 
 bool test_selector_get_wrong_ref_to_unregistered(seljs::State &state) {
     state["Foo"].SetClass<SelectorFoo, int>();
-	state("foo = new Foo.Foo(4);");
+	state("foo = new Foo(4);");
     bool expected_message = false;
 
     try{
@@ -322,7 +322,7 @@ bool test_selector_get_wrong_ref_to_unregistered(seljs::State &state) {
 bool test_selector_get_wrong_ptr(seljs::State &state) {
     state["Foo"].SetClass<SelectorFoo, int>();
     state["Bar"].SetClass<SelectorBar>();
-	state("bar = new Bar.Bar();");
+	state("bar = new Bar();");
     SelectorFoo * foo = state["bar"];
     return foo == nullptr;
 }

@@ -144,7 +144,7 @@ bool test_obj_member_wrong_type(seljs::State &state) {
     state["Bar"].SetClass<ObjBar>();
     FooHolder fh{5};
     state["fh"].SetObj(fh, "acceptFoo", &FooHolder::acceptFoo);
-	state("bar = new Bar.Bar();");
+	state("bar = new Bar();");
 
     bool error_encounted = false;
     state.HandleExceptionsWith([&error_encounted](int, std::string, std::exception_ptr) {

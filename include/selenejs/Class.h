@@ -141,13 +141,18 @@ public:
           const std::string &name,
           Members... members) : _name(name) {
         _metatable_name = _name + "_lib";
-        MetatableRegistry::PushNewMetatable(state, typeid(T), _metatable_name);
+		MetatableRegistry::PushNewMetatable(state, typeid(T), _metatable_name);
         _register_dtor(state);
         _register_ctor(state);
-        _register_members(state, members...);
-		//// is this a lua only quirk?
-        //duk_dup(state, -1);
-		//duk_put_prop_string(state, -1, "__index"); 
+        _register_members(state, members...);		
+		// leave constructor function on the stack
+		duk_get_prop_string(state, -1, "\xFF" "constructor");
+		if (duk_is_function(state, -1)) {
+			duk_insert(state, -2); // invert with the prototype
+			duk_set_prototype(state, -2); // set the prototype of the constructor function
+		} else {
+			duk_pop(state);
+		}
     }
     ~Class() = default;
     Class(const Class &) = delete;

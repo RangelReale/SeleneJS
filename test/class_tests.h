@@ -96,7 +96,7 @@ bool test_register_class_custom(seljs::State &state) {
 
 bool test_get_member_variable(seljs::State &state) {
     state["Bar"].SetClass<Bar, int>("x", &Bar::x);
-	state("bar = new Bar.Bar(-2);");
+	state("bar = new Bar(-2);");
 	state("barx = bar.x();");
 	state("tmp = bar.x != null;");
     return state["barx"] == -2 && state["tmp"];
@@ -104,7 +104,7 @@ bool test_get_member_variable(seljs::State &state) {
 
 bool test_set_member_variable(seljs::State &state) {
     state["Bar"].SetClass<Bar, int>("x", &Bar::x);
-	state("bar = new Bar.Bar(-2);");
+	state("bar = new Bar(-2);");
 	state("bar.set_x(-4);");
 	state("barx = bar.x();");
     return state["barx"] == -4;
@@ -112,7 +112,7 @@ bool test_set_member_variable(seljs::State &state) {
 
 bool test_class_field_set(seljs::State &state) {
     state["Bar"].SetClass<Bar, int>("set", &Bar::SetX, "get", &Bar::GetX);
-	state("bar = new Bar.Bar(4);");
+	state("bar = new Bar(4);");
 	state("x = bar.get();");
     const bool check1 = state["x"] == 4;
 	state("bar.set(6);");
@@ -137,14 +137,14 @@ bool test_ctor_wrong_type(seljs::State &state) {
     state["Bar"].SetClass<Bar, int>();
     state["Zoo"].SetClass<Zoo, Bar*>();
     state["ZooAcceptor"].SetClass<ZooAcceptor, Zoo*>();
-	state("bar = new Bar.Bar(4);");
+	state("bar = new Bar(4);");
 
     bool error_encounted = false;
     state.HandleExceptionsWith([&error_encounted](int, std::string, std::exception_ptr) {
         error_encounted = true;
     });
 
-	state("zooAcceptor = new ZooAcceptor.ZooAcceptor(bar);");
+	state("zooAcceptor = new ZooAcceptor(bar);");
     return error_encounted;
 }
 
@@ -152,9 +152,9 @@ bool test_pass_wrong_type(seljs::State &state) {
     state["Bar"].SetClass<Bar, int>();
     state["Zoo"].SetClass<Zoo, Bar*>();
     state["ZooAcceptor"].SetClass<ZooAcceptor, Zoo*>("acceptZoo", &ZooAcceptor::acceptZoo);
-    state("bar = new Bar.Bar(4)");
-    state("zoo = new Zoo.Zoo(bar)");
-	state("zooAcceptor = new ZooAcceptor.ZooAcceptor(zoo);");
+    state("bar = new Bar(4)");
+    state("zoo = new Zoo(bar)");
+	state("zooAcceptor = new ZooAcceptor(zoo);");
 
     bool error_encounted = false;
     state.HandleExceptionsWith([&error_encounted](int, std::string, std::exception_ptr) {
@@ -167,8 +167,8 @@ bool test_pass_wrong_type(seljs::State &state) {
 bool test_pass_pointer(seljs::State &state) {
     state["Bar"].SetClass<Bar, int>();
     state["Zoo"].SetClass<Zoo, Bar*>("get", &Zoo::GetX);
-	state("bar = new Bar.Bar(4);");
-	state("zoo = new Zoo.Zoo(bar);");
+	state("bar = new Bar(4);");
+	state("zoo = new Zoo(bar);");
 	state("zoox = zoo.get();");
     return state["zoox"] == 4;
 }
@@ -176,8 +176,8 @@ bool test_pass_pointer(seljs::State &state) {
 bool test_pass_ref(seljs::State &state) {
     state["Bar"].SetClass<Bar, int>("get", &Bar::GetX);
     state["Zoo"].SetClass<Zoo, Bar*>("change_bar", &Zoo::ChangeBar);
-	state("bar = new Bar.Bar(4);");
-	state("zoo = new Zoo.Zoo(bar);");
+	state("bar = new Bar(4);");
+	state("zoo = new Zoo(bar);");
 	state("zoo.change_bar(bar);");
 	state("barx = bar.get();");
     return state["barx"] == 8;
@@ -186,7 +186,7 @@ bool test_pass_ref(seljs::State &state) {
 bool test_return_pointer(seljs::State &state) {
     state["Bar"].SetClass<Bar, int>("get", &Bar::GetX);
     state["BarHolder"].SetClass<BarHolder, int>("get", &BarHolder::getPtr);
-	state("bh = new BarHolder.BarHolder(4);");
+	state("bh = new BarHolder(4);");
 	state("bar = bh.get();");
 	state("barx = bar.get();");
     return state["barx"] == 4;
@@ -195,7 +195,7 @@ bool test_return_pointer(seljs::State &state) {
 bool test_return_ref(seljs::State &state) {
     state["Bar"].SetClass<Bar, int>("get", &Bar::GetX);
     state["BarHolder"].SetClass<BarHolder, int>("get", &BarHolder::getRef);
-	state("bh = new BarHolder.BarHolder(4);");
+	state("bh = new BarHolder(4);");
 	state("bar = bh.get();");
 	state("barx = bar.get();");
     return state["barx"] == 4;
@@ -204,7 +204,7 @@ bool test_return_ref(seljs::State &state) {
 bool test_return_val(seljs::State &state) {
     state["Bar"].SetClass<Bar, int>("get", &Bar::GetX);
     state["BarHolder"].SetClass<BarHolder, int>("get", &BarHolder::getValue);
-	state("bh = new BarHolder.BarHolder(4);");
+	state("bh = new BarHolder(4);");
 	state("bar = bh.get();");
 	state("barx = bar.get();");
     return state["barx"] == 4;
@@ -212,7 +212,7 @@ bool test_return_val(seljs::State &state) {
 
 bool test_freestanding_fun_ref(seljs::State &state) {
     state["Bar"].SetClass<Bar, int>();
-	state("bar = new Bar.Bar(4);");
+	state("bar = new Bar(4);");
     state["print_bar"] = &ShowBarRef;
 	state("barstring = print_bar(bar);");
     return state["barstring"] == "4";
@@ -220,7 +220,7 @@ bool test_freestanding_fun_ref(seljs::State &state) {
 
 bool test_freestanding_fun_ptr(seljs::State &state) {
     state["Bar"].SetClass<Bar, int>();
-	state("bar = new Bar.Bar(4);");
+	state("bar = new Bar(4);");
     state["print_bar"] = &ShowBarPtr;
 	state("barstring = print_bar(bar);");
     return state["barstring"] == "4";
@@ -237,14 +237,14 @@ struct ConstMemberTest {
 bool test_const_member_function(seljs::State &state) {
     state["ConstMemberTest"].SetClass<ConstMemberTest>(
         "get_bool", &ConstMemberTest::get_bool);
-	state("tmp = new ConstMemberTest.ConstMemberTest();");
+	state("tmp = new ConstMemberTest();");
     return state["tmp"];
 }
 
 bool test_const_member_variable(seljs::State &state) {
     state["ConstMemberTest"].SetClass<ConstMemberTest>(
         "foo", &ConstMemberTest::foo);
-	state("tmp1 = new ConstMemberTest.ConstMemberTest().foo != null;");
-	state("tmp2 = new ConstMemberTest.ConstMemberTest().set_foo == null;");
+	state("tmp1 = new ConstMemberTest().foo != null;");
+	state("tmp2 = new ConstMemberTest().set_foo == null;");
     return state["tmp1"] && state["tmp2"];
 }

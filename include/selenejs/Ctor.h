@@ -21,7 +21,7 @@ public:
             duvL_setmetatable(state, metatable_name.c_str());
            }) {
 		duv_push_c_function_ptr(l, &detail::_js_dispatcher, DUK_VARARGS, (void *)static_cast<BaseFun *>(this));
-		duk_put_prop_string(l, -2, class_name.c_str()); // use class name as function name
+		duk_put_prop_string(l, -2, "\xFF" "constructor"); // set an internal constructor property
     }
 
     int Apply(duk_context *l) {

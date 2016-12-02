@@ -32,7 +32,7 @@ bool test_function_in_constructor(seljs::State &state) {
     state["Mutator"].SetClass<Mutator, seljs::function<void(int)>>();
     state.Load("../test/test_ref.js");
     bool check1 = state["a"] == 4;
-	state("mutator = new Mutator.Mutator(mutate_a);");
+	state("mutator = new Mutator(mutate_a);");
     bool check2 = state["a"] == -4;
     return check1 && check2;
 }
@@ -40,7 +40,7 @@ bool test_function_in_constructor(seljs::State &state) {
 bool test_pass_function_to_lua(seljs::State &state) {
     state["Mutator"].SetClass<Mutator>("foobar", &Mutator::Foobar);
     state.Load("../test/test_ref.js");
-	state("mutator = new Mutator.Mutator();");
+	state("mutator = new Mutator();");
 	state("mutator.foobar(true, foo, bar)();");
     bool check1 = state["test"] == "foo";
 	state("mutator.foobar(false, foo, bar)();");
@@ -57,7 +57,7 @@ bool test_call_returned_lua_function(seljs::State &state) {
 bool test_call_result_is_alive_ptr(seljs::State &state) {
     using namespace test_lifetime;
     state["Obj"].SetClass<InstanceCounter>();
-	state("function createObj() { return new Obj.Obj(); }");
+	state("function createObj() { return new Obj(); }");
     seljs::function<seljs::Pointer<InstanceCounter>()> createObj = state["createObj"];
     int const instanceCountBeforeCreation = InstanceCounter::instances;
 
@@ -70,7 +70,7 @@ bool test_call_result_is_alive_ptr(seljs::State &state) {
 bool test_call_result_is_alive_ref(seljs::State &state) {
     using namespace test_lifetime;
     state["Obj"].SetClass<InstanceCounter>();
-	state("function createObj() { return new Obj.Obj(); }");
+	state("function createObj() { return new Obj(); }");
     seljs::function<seljs::Reference<InstanceCounter>()> createObj = state["createObj"];
     int const instanceCountBeforeCreation = InstanceCounter::instances;
 
@@ -147,7 +147,7 @@ bool test_function_call_with_nullptr_ref(seljs::State &state) {
 bool test_function_call_with_wrong_ref(seljs::State &state) {
     state["Foo"].SetClass<FunctionFoo, int>();
     state["Bar"].SetClass<FunctionBar>();
-	state("function makeBar() { return new Bar.Bar(); }");
+	state("function makeBar() { return new Bar(); }");
     seljs::function<FunctionFoo &()> getFoo = state["makeBar"];
     bool error_encounted = false;
 
@@ -163,14 +163,14 @@ bool test_function_call_with_wrong_ref(seljs::State &state) {
 bool test_function_call_with_wrong_ptr(seljs::State &state) {
     state["Foo"].SetClass<FunctionFoo, int>();
     state["Bar"].SetClass<FunctionBar>();
-	state("function makeBar() { return new Bar.Bar(); }");
+	state("function makeBar() { return new Bar(); }");
     seljs::function<FunctionFoo *()> getFoo = state["makeBar"];
     return nullptr == getFoo();
 }
 
 bool test_function_get_registered_class_by_value(seljs::State &state) {
     state["Foo"].SetClass<FunctionFoo, int>();
-	state("function getFoo() { return new Foo.Foo(4); }");
+	state("function getFoo() { return new Foo(4); }");
     seljs::function<FunctionFoo()> getFoo = state["getFoo"];
 
     FunctionFoo foo = getFoo();
