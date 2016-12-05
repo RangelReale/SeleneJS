@@ -149,7 +149,7 @@ public:
 		duk_get_prop_string(state, -1, "\xFF" "constructor");
 		if (duk_is_function(state, -1)) {
 			duk_insert(state, -2); // invert with the prototype
-			duk_set_prototype(state, -2); // set the prototype of the constructor function
+			duk_put_prop_string(ctx, -2, "prototype"); // MUST set by prop, duk_set_prototype doesn't work for this case!
 		} else {
 			duk_pop(state);
 		}
